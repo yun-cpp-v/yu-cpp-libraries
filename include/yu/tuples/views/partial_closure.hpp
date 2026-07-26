@@ -1,0 +1,71 @@
+// yutool: include guard
+#ifndef YU_TUPLES_VIEWS_PARTIAL_CLOSURE_HPP_
+#define YU_TUPLES_VIEWS_PARTIAL_CLOSURE_HPP_
+
+#include "tuple_adaptor_closure.hpp"
+#include "yu/tuples/access/get.hpp"
+#include <yu/tuples/apply.hpp>
+#include <yu/tuples/concepts/tuple.hpp>
+#include <functional>
+#include <tuple>
+#include <utility>
+
+namespace yu::tuples {
+
+template <typename Adaptor, typename... Args>
+struct partial_closure : tuple_adaptor_closure<partial_closure<Adaptor, Args...>> {
+    private:
+        [[no_unique_address]]
+        Adaptor             adaptor_;
+        std::tuple<Args...> args_;
+
+        template <typename Self>
+        constexpr decltype(auto) adaptor(this Self&& self) noexcept {
+            return std::forward_like<Self>(self.adaptor_);
+        }
+
+        template <typename Self, std::size_t Idx>
+        constexpr decltype(auto) arg(this Self&& self, index_t<Idx> index) noexcept {
+            return tuples::get(std::forward_like<Self>(self.args_), index);
+        }
+
+        template <typename Self, typename Tuple>
+        static consteval bool invocable(Self&& self, Tuple&& tuple) {
+            return []<std::size_t... Idx>(std::index_sequence<Idx...>) {
+                return requires { std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...); };
+            }(std::index_sequence_for<Args...>{});
+        }
+
+        template <typename Self, typename Tuple>
+        static consteval bool is_nothrow(Self&& self, Tuple&& tuple) {
+            return [&]<std::size_t... Idx>(std::index_sequence<Idx...>) {
+                return noexcept(std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...));
+            }(std::index_sequence_for<Args...>{});
+        }
+
+    public:
+        constexpr explicit partial_closure(Adaptor adaptor, Args... args) noexcept :
+            adaptor_(std::move(adaptor)), args_(std::move(args)...) {}
+
+        template <typename Self, tuple Tuple>
+        constexpr decltype(auto) operator()(this Self&& self, Tuple&& tuple) noexcept(
+            is_nothrow(std::forward<Self>(self), std::forward<Tuple>(tuple))
+        ) requires (invocable(std::forward<Self>(self), std::forward<Tuple>(tuple)))
+        {
+            return [&]<std::size_t... Idx>(std::index_sequence<Idx...>) {
+                return std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...);
+            }(std::index_sequence_for<Args...>{});
+        }
+};
+
+template <typename Adaptor, typename... Args>
+partial_closure(Adaptor, Args...) -> partial_closure<Adaptor, Args...>;
+
+template <typename Adaptor, typename... Args>
+constexpr auto make_partial_closure(Adaptor&& adaptor, Args&&... args) noexcept {
+    return partial_closure{std::forward<Adaptor>(adaptor), std::forward<Args>(args)...};
+}
+
+} // namespace yu::tuples
+
+#endif
