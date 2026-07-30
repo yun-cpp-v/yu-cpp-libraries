@@ -23,6 +23,11 @@ class transform_view : public view_interface<transform_view<View, Fn>> {
         [[no_unique_address]]
         Fn fn_;
 
+        template <typename Self>
+        constexpr decltype(auto) fn(this Self&& self) noexcept {
+            return std::forward_like<Self>(self.fn_);
+        }
+
     public:
         static constexpr size<View> size{};
 
@@ -41,9 +46,9 @@ class transform_view : public view_interface<transform_view<View, Fn>> {
         requires (Idx < size)
         [[nodiscard]]
         constexpr decltype(auto) get(this Self&& self) noexcept(
-            noexcept(std::invoke(self.fn_, tuples::get(self.base(), index<Idx>)))
+            noexcept(std::invoke(self.fn(), tuples::get(self.base(), index<Idx>)))
         ) {
-            return std::invoke(self.fn_, tuples::get(self.base(), index<Idx>));
+            return std::invoke(self.fn(), tuples::get(self.base(), index<Idx>));
         }
 };
 
