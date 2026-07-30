@@ -76,17 +76,15 @@ class split_view : public view_interface<split_view<View, Pred>> {
         View base_;
 
         template <std::size_t Idx, typename Self>
-        static consteval bool is_nothrow(Self&& self) {
+        static consteval bool is_nothrow() {
             constexpr auto index_range = ranges_[index<Idx>];
             using index_range_t        = decltype(index_range)::value_type;
 
             constexpr std::size_t begin = meta::constant_invoke(meta::constant<&index_range_t::begin>, index_range);
             constexpr std::size_t end   = meta::constant_invoke(meta::constant<&index_range_t::end>, index_range);
 
-            auto&& base = self.base();
-
             return []<std::size_t... I>(std::index_sequence<I...>) -> bool {
-                return noexcept(((tuples::get(base, index<begin + I>)), ...));
+                return (noexcept(tuples::get(std::declval<Self>().base(), index<begin + I>)) && ...);
             }(std::make_index_sequence<end - begin>{});
         }
 
@@ -105,17 +103,15 @@ class split_view : public view_interface<split_view<View, Pred>> {
         template <std::size_t Idx, typename Self>
         requires (Idx < size)
         [[nodiscard]]
-        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx>(std::forward<Self>(self))) {
+        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx, Self>()) {
             constexpr auto index_range = ranges_[index<Idx>];
             using index_range_t        = decltype(index_range)::value_type;
 
             constexpr std::size_t begin = meta::constant_invoke(meta::constant<&index_range_t::begin>, index_range);
             constexpr std::size_t end   = meta::constant_invoke(meta::constant<&index_range_t::end>, index_range);
 
-            auto&& base = self.base();
-
             return [&]<std::size_t... I>(std::index_sequence<I...>) -> decltype(auto) {
-                return std::forward_as_tuple(tuples::get(base, index<begin + I>)...);
+                return std::forward_as_tuple(tuples::get(self.base(), index<begin + I>)...);
             }(std::make_index_sequence<end - begin>{});
         }
 };

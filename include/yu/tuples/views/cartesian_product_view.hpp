@@ -53,21 +53,26 @@ class cartesian_product_view : view_interface<cartesian_product_view<Views...>> 
         static constexpr auto indices_table_ = make_indices_table();
         using indices_table_t                = decltype(indices_table_)::value_type;
 
-        std::tuple<Views...> base_;
+        std::tuple<Views...> bases_;
 
         template <typename Self>
-        constexpr decltype(auto) base(this Self&& self) noexcept {
-            return std::forward_like<Self>(self.base_);
+        constexpr decltype(auto) bases(this Self&& self) noexcept {
+            return std::forward_like<Self>(self.bases_);
         }
 
         template <std::size_t Idx, typename Self>
-        static consteval bool is_nothrow(Self&& self) {
+        constexpr decltype(auto) base(this Self&& self, index_t<Idx> idx) noexcept(
+            noexcept(tuples::get(self.bases(), idx))
+        ) {
+            return tuples::get(self.bases(), idx);
+        }
+
+        template <std::size_t Idx, typename Self>
+        static consteval bool is_nothrow() {
             constexpr auto indices = indices_table_[index<Idx>];
 
-            auto&& base = self.base();
-
             return []<std::size_t... Dims>(std::index_sequence<Dims...>) {
-                return noexcept((tuples::get(tuples::get(base, index<Dims>), indices[index<Dims>]), ...));
+                return (noexcept(tuples::get(std::declval<Self>().base(index<Dims>), indices[index<Dims>])) && ...);
             }(std::index_sequence_for<Views...>{});
         }
 
@@ -75,17 +80,15 @@ class cartesian_product_view : view_interface<cartesian_product_view<Views...>> 
         static constexpr auto size = meta::constant_invoke(meta::constant<&indices_table_t::size>, indices_table_);
 
         constexpr explicit cartesian_product_view(Views... views) :
-            base_(std::move(views)...) {}
+            bases_(std::move(views)...) {}
 
         template <std::size_t Idx, typename Self>
         requires (Idx < size)
-        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx>(std::forward<Self>(self))) {
+        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx, Self>()) {
             constexpr auto indices = indices_table_[index<Idx>];
 
-            auto&& base = self.base();
-
             return [&]<std::size_t... Dims>(std::index_sequence<Dims...>) {
-                return std::forward_as_tuple(tuples::get(tuples::get(base, index<Dims>), indices[index<Dims>])...);
+                return std::forward_as_tuple(tuples::get(self.base(index<Dims>), indices[index<Dims>])...);
             }(std::index_sequence_for<Views...>{});
         }
 };

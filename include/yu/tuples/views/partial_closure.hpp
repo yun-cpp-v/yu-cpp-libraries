@@ -24,22 +24,35 @@ struct partial_closure : tuple_adaptor_closure<partial_closure<Adaptor, Args...>
             return std::forward_like<Self>(self.adaptor_);
         }
 
+        template <typename Self>
+        constexpr decltype(auto) args(this Self&& self) noexcept {
+            return std::forward_like<Self>(self.args_);
+        }
+
         template <typename Self, std::size_t Idx>
-        constexpr decltype(auto) arg(this Self&& self, index_t<Idx> index) noexcept {
-            return tuples::get(std::forward_like<Self>(self.args_), index);
+        constexpr decltype(auto) arg(this Self&& self, index_t<Idx> index) noexcept(
+            noexcept(tuples::get(self.args(), index))
+        ) {
+            return tuples::get(self.args(), index);
         }
 
         template <typename Self, typename Tuple>
-        static consteval bool invocable(Self&& self, Tuple&& tuple) {
+        static consteval bool invocable() {
             return []<std::size_t... Idx>(std::index_sequence<Idx...>) {
-                return requires { std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...); };
+                return requires(Self&& self, Tuple&& tuple) {
+                    std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...);
+                };
             }(std::index_sequence_for<Args...>{});
         }
 
         template <typename Self, typename Tuple>
-        static consteval bool is_nothrow(Self&& self, Tuple&& tuple) {
+        static consteval bool is_nothrow() {
             return [&]<std::size_t... Idx>(std::index_sequence<Idx...>) {
-                return noexcept(std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...));
+                return noexcept(std::invoke(
+                    std::declval<Self>().adaptor(),
+                    std::declval<Tuple>(),
+                    std::declval<Self>().arg(index<Idx>)...
+                ));
             }(std::index_sequence_for<Args...>{});
         }
 
@@ -48,10 +61,8 @@ struct partial_closure : tuple_adaptor_closure<partial_closure<Adaptor, Args...>
             adaptor_(std::move(adaptor)), args_(std::move(args)...) {}
 
         template <typename Self, tuple Tuple>
-        constexpr decltype(auto) operator()(this Self&& self, Tuple&& tuple) noexcept(
-            is_nothrow(std::forward<Self>(self), std::forward<Tuple>(tuple))
-        ) requires (invocable(std::forward<Self>(self), std::forward<Tuple>(tuple)))
-        {
+        requires (invocable<Self, Tuple>())
+        constexpr decltype(auto) operator()(this Self&& self, Tuple&& tuple) noexcept(is_nothrow<Self, Tuple>()) {
             return [&]<std::size_t... Idx>(std::index_sequence<Idx...>) {
                 return std::invoke(self.adaptor(), std::forward<Tuple>(tuple), self.arg(index<Idx>)...);
             }(std::index_sequence_for<Args...>{});

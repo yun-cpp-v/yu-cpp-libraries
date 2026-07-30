@@ -29,13 +29,13 @@ namespace _unspecified {
 struct all_closure : tuple_adaptor_closure<all_closure> {
     private:
         template <typename Tuple>
-        static consteval bool is_nothrow(Tuple&& tuple) {
+        static consteval bool is_nothrow() {
             if constexpr (view<std::remove_cvref_t<Tuple>>) {
-                return noexcept(auto(std::forward<Tuple>(tuple)));
+                return noexcept(auto(std::declval<Tuple>()));
             } else if constexpr (_detail::all::ref_viewable<Tuple>) {
-                return noexcept(ref_view{std::forward<Tuple>(tuple)});
+                return noexcept(ref_view{std::declval<Tuple>()});
             } else if constexpr (_detail::all::owning_viewable<Tuple>) {
-                return noexcept(owning_view{std::forward<Tuple>(tuple)});
+                return noexcept(owning_view{std::declval<Tuple>()});
             }
         }
 
@@ -46,7 +46,7 @@ struct all_closure : tuple_adaptor_closure<all_closure> {
             || _detail::all::owning_viewable<Tuple>
         )
         [[nodiscard]]
-        static constexpr auto operator()(Tuple&& tuple) noexcept(is_nothrow(std::forward<Tuple>(tuple))) {
+        static constexpr auto operator()(Tuple&& tuple) noexcept(is_nothrow<Tuple>()) {
             if constexpr (view<std::remove_cvref_t<Tuple>>) {
                 return auto(std::forward<Tuple>(tuple));
             } else if constexpr (_detail::all::ref_viewable<Tuple>) {
