@@ -28,7 +28,6 @@ namespace _unspecified {
 struct get_fn {
     private:
         template <std::size_t Idx, typename T>
-        [[nodiscard]]
         static constexpr bool is_nothrow(T&& t, index_t<Idx>) {
             if constexpr (std::is_bounded_array_v<std::remove_cvref_t<T>>) {
                 return true;
