@@ -24,7 +24,7 @@ class single_view : public view_interface<single_view<T>> {
             value_(std::move(value)) {}
 
         template <std::size_t Idx, typename Self>
-        requires (Idx == 0)
+        requires (Idx < size)
         constexpr decltype(auto) get(this Self&& self) noexcept {
             return std::forward_like<Self>(self.value_);
         }
