@@ -13,58 +13,44 @@
 #include <yu/tuples/concepts/elementwise_meta_predicate.hpp>
 #include <yu/tuples/concepts/view.hpp>
 #include <yu/tuples/type_traits/element_type.hpp>
+#include <algorithm>
 #include <array>
 #include <cstddef>
+#include <ranges>
 #include <utility>
 
 namespace yu::tuples {
-
-namespace _detail::filter_view {
-
-template <std::size_t N>
-struct selected_indices {
-        std::size_t                count;
-        std::array<std::size_t, N> indices;
-};
-
-} // namespace _detail::filter_view
 
 template <view View, typename Pred>
 requires elementwise_meta_predicate<Pred, View>
 class filter_view : public view_interface<filter_view<View, Pred>> {
     private:
-        static consteval auto select_indices() {
+        static consteval auto make_index_table() {
             constexpr auto result = []<std::size_t... Idx>(std::index_sequence<Idx...>) consteval {
-                constexpr std::array  selected      = {_detail::meta_predicate_result_at_v<Pred, View, Idx>...};
-                constexpr std::size_t selected_size = selected.size();
+                static constexpr std::array flags = {_detail::meta_predicate_result_at_v<Pred, View, Idx>...};
 
-                std::array<std::size_t, selected_size> indices{};
+                auto index_table_view = std::views::iota(std::size_t{0}, size_v<View>)
+                                        | std::views::filter([](std::size_t index) { return flags[index]; });
 
-                std::size_t selected_index_count = 0;
+                constexpr std::size_t size = std::ranges::count(flags, true);
 
-                for (std::size_t i = 0; i < selected_size; ++i) {
-                    if (selected[i]) indices[selected_index_count++] = i;
-                }
+                std::array<std::size_t, size> index_table;
 
-                using selected_t = _detail::filter_view::selected_indices<selected_size>;
+                std::ranges::move(index_table_view, index_table.begin());
 
-                return selected_t{selected_index_count, indices};
+                return index_table;
             }(indices_for<View>);
 
             return meta::constant<result>;
         }
 
-        static constexpr auto selected_indices_ = select_indices();
-        using selected_indices_t                = decltype(selected_indices_)::value_type;
-
-        static constexpr auto indices_
-            = meta::constant_invoke(meta::constant<&selected_indices_t::indices>, selected_indices_);
+        static constexpr auto index_table_ = make_index_table();
+        using index_table_t                = decltype(index_table_)::value_type;
 
         View base_;
 
     public:
-        static constexpr auto size
-            = meta::constant_invoke(meta::constant<&selected_indices_t::count>, selected_indices_);
+        static constexpr auto size = meta::constant_invoke(meta::constant<&index_table_t::size>, index_table_);
 
         constexpr explicit filter_view(View view, Pred) noexcept :
             base_(std::move(view)) {}
@@ -79,9 +65,9 @@ class filter_view : public view_interface<filter_view<View, Pred>> {
         requires (Idx < size)
         [[nodiscard]]
         constexpr decltype(auto) get(this Self&& self) noexcept(
-            noexcept(tuples::get(self.base(), indices_[index<Idx>]))
+            noexcept(tuples::get(self.base(), index_table_[index<Idx>]))
         ) {
-            return tuples::get(self.base(), indices_[index<Idx>]);
+            return tuples::get(self.base(), index_table_[index<Idx>]);
         }
 };
 

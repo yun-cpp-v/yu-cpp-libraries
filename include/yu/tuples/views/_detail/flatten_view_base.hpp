@@ -9,36 +9,40 @@
 #include <yu/tuples/type_traits/element_type.hpp>
 #include <yu/tuples/type_traits/is_gettable.hpp>
 #include <yu/tuples/utility/index_sequence_for.hpp>
+#include <algorithm>
 #include <cstddef>
+#include <ranges>
 #include <utility>
 
 namespace yu::tuples::_detail {
 
-struct mapped_index {
-        std::size_t base_index;
-        std::size_t inner_index;
-};
-
 template <typename Base>
 class flatten_view_base {
     private:
+        struct index_pair {
+                std::size_t base_index;
+                std::size_t inner_index;
+        };
+
         static consteval auto make_index_map() {
             constexpr auto result = []<std::size_t... Idx>(std::index_sequence<Idx...>) consteval {
-                constexpr std::size_t total_size   = (size_v<element_type_t<Idx, Base>> + ...);
-                constexpr std::size_t view_sizes[] = {size_v<element_type_t<Idx, Base>>...};
+                auto index_map_view
+                    = std::views::zip_transform(
+                          [](auto&& outer_index, auto&& inner) {
+                              return inner | std::views::transform([outer_index](auto inner_index) {
+                                         return index_pair{outer_index, inner_index};
+                                     });
+                          },
+                          std::array{Idx...},
+                          std::array{std::views::iota(std::size_t{0}, size_v<element_type_t<Idx, Base>>)...}
+                      )
+                      | std::views::join;
 
-                std::array<mapped_index, total_size> index_map{};
+                constexpr std::size_t size = (size_v<element_type_t<Idx, Base>> + ...);
 
-                for (std::size_t total_index = 0; total_index < total_size; ++total_index) {
-                    std::size_t base_index = 0, inner_index = total_index;
+                std::array<index_pair, size> index_map;
 
-                    while (view_sizes[base_index] <= inner_index) {
-                        inner_index -= view_sizes[base_index];
-                        ++base_index;
-                    }
-
-                    index_map[total_index] = mapped_index{base_index, inner_index};
-                }
+                std::ranges::copy(index_map_view, index_map.begin());
 
                 return index_map;
             }(indices_for<Base>);
@@ -60,8 +64,8 @@ class flatten_view_base {
         template <std::size_t Idx, typename Self>
         static consteval bool is_nothrow() {
             constexpr auto map         = index_map_[index<Idx>];
-            constexpr auto base_index  = meta::constant_invoke(meta::constant<&mapped_index::base_index>, map);
-            constexpr auto inner_index = meta::constant_invoke(meta::constant<&mapped_index::inner_index>, map);
+            constexpr auto base_index  = meta::constant_invoke(meta::constant<&index_pair::base_index>, map);
+            constexpr auto inner_index = meta::constant_invoke(meta::constant<&index_pair::inner_index>, map);
 
             return noexcept(tuples::get(tuples::get(std::declval<Self>().base(), base_index), inner_index));
         }
@@ -77,8 +81,8 @@ class flatten_view_base {
         [[nodiscard]]
         constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx, Self>()) {
             constexpr auto map         = index_map_[index<Idx>];
-            constexpr auto base_index  = meta::constant_invoke(meta::constant<&mapped_index::base_index>, map);
-            constexpr auto inner_index = meta::constant_invoke(meta::constant<&mapped_index::inner_index>, map);
+            constexpr auto base_index  = meta::constant_invoke(meta::constant<&index_pair::base_index>, map);
+            constexpr auto inner_index = meta::constant_invoke(meta::constant<&index_pair::inner_index>, map);
 
             return tuples::get(tuples::get(self.base(), base_index), inner_index);
         }

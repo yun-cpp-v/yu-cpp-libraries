@@ -9,9 +9,12 @@
 #include <yu/tuples/access/get.hpp>
 #include <yu/tuples/access/index.hpp>
 #include <yu/tuples/access/size.hpp>
+#include <yu/tuples/apply.hpp>
 #include <yu/tuples/concepts/tuple.hpp>
 #include <yu/tuples/concepts/view.hpp>
+#include <algorithm>
 #include <array>
+#include <ranges>
 #include <tuple>
 #include <utility>
 
@@ -19,39 +22,31 @@ namespace yu::tuples {
 
 template <view... Views>
 requires (0 < sizeof...(Views))
-class cartesian_product_view : view_interface<cartesian_product_view<Views...>> {
+class cartesian_product_view : public view_interface<cartesian_product_view<Views...>> {
     private:
         static consteval auto make_indices_table() {
             constexpr auto result = [] consteval {
-                constexpr std::size_t dim        = sizeof...(Views);
-                constexpr std::size_t table_size = (size_v<Views> * ... * 1);
+                auto indices_table_view
+                    = std::views::cartesian_product(std::views::iota(std::size_t{0}, size_v<Views>)...);
 
-                constexpr std::array<std::size_t, dim> sizes = {size_v<Views>...};
+                using indices_t            = std::array<std::size_t, sizeof...(Views)>;
+                constexpr std::size_t size = (size_v<Views> * ... * 1);
 
-                using indices_t       = std::array<std::size_t, dim>;
-                using indices_table_t = std::array<indices_t, table_size>;
+                std::array<indices_t, size> indices_table;
 
-                indices_table_t table{};
-                indices_t       indices{};
+                std::ranges::transform(indices_table_view, indices_table.begin(), [](auto tuple) {
+                    return tuples::apply([](auto... index) { return std::array{index...}; }, tuple);
+                });
 
-                for (std::size_t linear = 0; linear < table_size; ++linear) {
-                    table[linear] = indices;
-
-                    for (std::size_t i = dim; i-- > 0;) {
-                        if (++indices[i] < sizes[i]) break;
-
-                        indices[i] = 0;
-                    }
-                }
-
-                return table;
+                return indices_table;
             }();
 
             return meta::constant<result>;
         }
 
         static constexpr auto indices_table_ = make_indices_table();
-        using indices_table_t                = decltype(indices_table_)::value_type;
+
+        using indices_table_t = decltype(indices_table_)::value_type;
 
         std::tuple<Views...> bases_;
 
