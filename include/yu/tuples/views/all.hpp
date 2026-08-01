@@ -2,6 +2,7 @@
 #ifndef YU_TUPLES_VIEWS_ALL_HPP_
 #define YU_TUPLES_VIEWS_ALL_HPP_
 
+#include "_detail/adaptor_closure.hpp"
 #include "owning_view.hpp"
 #include "ref_view.hpp"
 #include "tuple_adaptor_closure.hpp"

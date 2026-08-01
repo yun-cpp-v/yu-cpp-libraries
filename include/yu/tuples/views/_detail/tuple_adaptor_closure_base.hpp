@@ -11,13 +11,6 @@ template <typename D>
 requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
 struct tuple_adaptor_closure {};
 
-namespace _detail {
-
-template <typename T>
-concept adaptor_closure = std::derived_from<std::remove_cvref_t<T>, tuple_adaptor_closure<std::remove_cvref_t<T>>>;
-
-} // namespace _detail
-
 } // namespace yu::tuples
 
 #endif

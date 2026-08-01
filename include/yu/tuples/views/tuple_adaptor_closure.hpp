@@ -2,6 +2,7 @@
 #ifndef YU_TUPLES_VIEWS_TUPLE_ADAPTOR_CLOSURE_HPP_
 #define YU_TUPLES_VIEWS_TUPLE_ADAPTOR_CLOSURE_HPP_
 
+#include "_detail/adaptor_closure.hpp"
 #include "_detail/composed_closure.hpp"
 #include "_detail/decay_constructible.hpp"
 #include <yu/tuples/concepts/tuple.hpp>
@@ -14,9 +15,9 @@
 
 namespace yu::tuples {
 
-// template <typename D>
-// requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
-// struct tuple_adaptor_closure;
+template <typename D>
+requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
+struct tuple_adaptor_closure;
 
 // Apply TACO to Tuple
 template <tuple Tuple, _detail::adaptor_closure Closure>
