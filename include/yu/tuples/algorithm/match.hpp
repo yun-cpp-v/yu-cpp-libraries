@@ -32,7 +32,7 @@ struct fn {
             Proj1    proj1 = {},
             Proj2    proj2 = {}
         ) {
-            auto&& result = search(
+            auto&& result = tuples::search(
                 std::forward<Tuple1>(tuple1),
                 std::forward<Tuple2>(tuple2),
                 std::ref(pred),
