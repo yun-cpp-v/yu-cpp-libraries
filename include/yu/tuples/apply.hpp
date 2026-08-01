@@ -14,9 +14,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::apply {
 
-struct apply_fn {
+struct fn {
     public:
         template <typename Fn, tuple Tuple>
         [[nodiscard]]
@@ -29,11 +29,11 @@ struct apply_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::apply
 
 inline namespace _fn {
 
-inline constexpr _unspecified::apply_fn apply{};
+inline constexpr _unspecified::apply::fn apply{};
 
 }
 

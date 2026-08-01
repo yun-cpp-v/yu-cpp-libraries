@@ -11,18 +11,18 @@
 
 namespace yu::tuples {
 
-namespace _detail {
+namespace _detail::elementwise_unary_invocable {
 
 template <typename Fn, typename Tuple, std::size_t... Idx>
-consteval bool elementwise_unary_invocable_impl(std::index_sequence<Idx...>) {
+consteval bool impl(std::index_sequence<Idx...>) {
     return (std::invocable<Fn, element_type_t<Idx, Tuple>> && ...);
 }
 
-} // namespace _detail
+} // namespace _detail::elementwise_unary_invocable
 
 template <typename Fn, typename Tuple>
 concept elementwise_unary_invocable
-    = tuple<Tuple> && _detail::elementwise_unary_invocable_impl<Fn, Tuple>(indices_for<Tuple>);
+    = tuple<Tuple> && _detail::elementwise_unary_invocable::impl<Fn, Tuple>(indices_for<Tuple>);
 
 template <typename Fn, typename Tuple>
 concept elementwise_unary_regular_invocable = elementwise_unary_invocable<Fn, Tuple>;

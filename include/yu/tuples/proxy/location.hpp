@@ -15,7 +15,7 @@
 
 namespace yu::tuples {
 
-namespace _detail {
+namespace _detail::location {
 
 template <std::size_t... Idx>
 constexpr auto make_index_variant_table(std::index_sequence<Idx...>) {
@@ -24,12 +24,12 @@ constexpr auto make_index_variant_table(std::index_sequence<Idx...>) {
     return std::array{dispatch_variant{index<Idx>}...};
 }
 
-} // namespace _detail
+} // namespace _detail::location
 
 template <view View>
 class location {
     private:
-        static constexpr auto index_variant_table_ = _detail::make_index_variant_table(indices_for<View>);
+        static constexpr auto index_variant_table_ = _detail::location::make_index_variant_table(indices_for<View>);
 
         View        view_;
         std::size_t index_;

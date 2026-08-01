@@ -60,9 +60,9 @@ template <typename... Views>
 zip_view(Views&&...) -> zip_view<views::all_t<Views&&>...>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::zip {
 
-struct zip_adaptor {
+struct adaptor {
         template <tuple... Tuples>
         requires (0 < sizeof...(Tuples))
         static constexpr auto operator()(Tuples&&... tuples) noexcept(noexcept(zip_view{
@@ -74,9 +74,9 @@ struct zip_adaptor {
         static constexpr auto operator()() noexcept { return empty; }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::zip
 
-inline constexpr _unspecified::zip_adaptor zip{};
+inline constexpr _unspecified::zip::adaptor zip{};
 
 } // namespace views
 

@@ -25,20 +25,20 @@ struct type_t {
 template <typename Type>
 inline constexpr type_t<Type> type{};
 
-namespace _unspecified {
+namespace _unspecified::as_type {
 
-struct as_type_fn {
+struct fn {
         template <typename T>
         static constexpr auto operator()(T&&) noexcept -> type_t<std::remove_cvref_t<T>> {
             return {};
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::as_type
 
 inline namespace _fn {
 
-inline constexpr _unspecified::as_type_fn as_type{};
+inline constexpr _unspecified::as_type::fn as_type{};
 
 }
 

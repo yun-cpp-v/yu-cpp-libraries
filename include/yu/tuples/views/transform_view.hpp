@@ -57,9 +57,9 @@ transform_view(Tuple&&, Fn) -> transform_view<views::all_t<Tuple&&>, Fn>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::transform {
 
-struct transform_adaptor {
+struct adaptor {
         template <tuple Tuple, typename Fn>
         requires elementwise_unary_regular_invocable<Fn, Tuple>
         static constexpr auto operator()(Tuple&& tuple, Fn&& fn) noexcept(
@@ -70,13 +70,13 @@ struct transform_adaptor {
 
         template <typename Fn>
         static constexpr auto operator()(Fn&& fn) noexcept {
-            return partial_closure(transform_adaptor{}, std::forward<Fn>(fn));
+            return partial_closure(adaptor{}, std::forward<Fn>(fn));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::transform
 
-inline constexpr _unspecified::transform_adaptor transform{};
+inline constexpr _unspecified::transform::adaptor transform{};
 
 } // namespace views
 

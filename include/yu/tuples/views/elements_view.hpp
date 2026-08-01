@@ -60,9 +60,9 @@ elements_view(Tuple&&, index_t<N>) -> elements_view<views::all_t<Tuple&&>, N>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::elements {
 
-struct elements_adaptor {
+struct adaptor {
         template <tuple Tuple, std::size_t N>
         requires tuples::_detail::tuple_of_tuples<Tuple>
                  && tuples::_detail::elements_view::each_tuple_gettable_at<N, Tuple>
@@ -74,13 +74,13 @@ struct elements_adaptor {
 
         template <std::size_t N>
         static constexpr auto operator()(index_t<N> n) noexcept {
-            return make_partial_closure(elements_adaptor{}, n);
+            return make_partial_closure(adaptor{}, n);
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::elements
 
-inline constexpr _unspecified::elements_adaptor elements;
+inline constexpr _unspecified::elements::adaptor elements;
 
 } // namespace views
 

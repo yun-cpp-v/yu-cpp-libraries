@@ -11,21 +11,25 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::find {
 
-struct find_fn {
+struct fn {
         template <tuple Tuple, typename T, typename Proj = std::identity>
         [[nodiscard]]
         static constexpr std::optional<std::size_t> operator()(Tuple&& tuple, const T& value, Proj proj = {}) {
-            return find_if(std::forward<Tuple>(tuple), std::bind_back(std::ranges::equal_to{}, value), std::ref(proj));
+            return tuples::find_if(
+                std::forward<Tuple>(tuple),
+                std::bind_back(std::ranges::equal_to{}, value),
+                std::ref(proj)
+            );
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::find
 
 inline namespace _fn {
 
-inline constexpr _unspecified::find_fn find{};
+inline constexpr _unspecified::find::fn find{};
 
 }
 

@@ -6,9 +6,9 @@
 
 namespace yu::meta::functions {
 
-namespace _unspecified {
+namespace _unspecified::extent {
 
-struct extent_fn {
+struct fn {
         template <typename T, unsigned I = 0>
         [[nodiscard]]
         static constexpr auto operator()(type_t<T>, constant_t<I>) noexcept -> constant_t<std::extent_v<T, I>> {
@@ -16,7 +16,7 @@ struct extent_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::extent
 
 DEFINE_FUNCTION_OBJECT(extent)
 

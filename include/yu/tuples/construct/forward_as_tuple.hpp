@@ -9,9 +9,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::forward_as_tuple {
 
-struct forward_as_tuple_adaptor {
+struct adaptor {
         template <tuple Tuple>
         [[nodiscard]]
         static constexpr decltype(auto) operator()(Tuple&& tuple) noexcept {
@@ -25,14 +25,14 @@ struct forward_as_tuple_adaptor {
 
         template <tuple Tuple>
         [[nodiscard]]
-        friend constexpr decltype(auto) operator|(Tuple&& tuple, forward_as_tuple_adaptor) noexcept {
+        friend constexpr decltype(auto) operator|(Tuple&& tuple, adaptor) noexcept {
             return operator()(std::forward<Tuple>(tuple));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::forward_as_tuple
 
-inline constexpr _unspecified::forward_as_tuple_adaptor forward_as_tuple{};
+inline constexpr _unspecified::forward_as_tuple::adaptor forward_as_tuple{};
 
 } // namespace yu::tuples
 

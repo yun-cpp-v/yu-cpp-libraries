@@ -11,23 +11,23 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::locate {
 
-struct locate_fn {
+struct fn {
         template <tuple Tuple, typename T, typename Proj = std::identity>
         [[nodiscard]]
         static constexpr decltype(auto) operator()(Tuple&& tuple, const T& value, Proj proj = {}) {
-            auto&& result = find(std::forward<Tuple>(tuple), value, std::ref(proj));
+            auto&& result = tuples::find(std::forward<Tuple>(tuple), value, std::ref(proj));
 
             return result.transform([&](std::size_t index) { return location{std::forward<Tuple>(tuple), index}; });
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::locate
 
 inline namespace _fn {
 
-inline constexpr _unspecified::locate_fn locate{};
+inline constexpr _unspecified::locate::fn locate{};
 
 }
 

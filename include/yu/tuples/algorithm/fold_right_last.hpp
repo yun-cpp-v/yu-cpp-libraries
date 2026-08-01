@@ -14,9 +14,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::fold_right_last {
 
-struct fold_right_last_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Fn>
         requires _detail::right_foldable_last<Fn, Tuple>
@@ -30,11 +30,11 @@ struct fold_right_last_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::fold_right_last
 
 inline namespace _fn {
 
-inline constexpr _unspecified::fold_right_last_fn fold_right_last{};
+inline constexpr _unspecified::fold_right_last::fn fold_right_last{};
 
 }
 

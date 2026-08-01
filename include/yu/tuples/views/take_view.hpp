@@ -30,9 +30,9 @@ take_view(Tuple&&, index_t<Count>) -> take_view<views::all_t<Tuple&&>, Count>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::take {
 
-struct take_adaptor {
+struct adaptor {
         template <tuple Tuple, std::size_t Count>
         static constexpr auto operator()(Tuple&& tuple, index_t<Count> count) noexcept(
             noexcept(take_view{std::forward<Tuple>(tuple), count})
@@ -42,13 +42,13 @@ struct take_adaptor {
 
         template <std::size_t Count>
         static constexpr auto operator()(index_t<Count> count) noexcept {
-            return make_partial_closure(take_adaptor{}, count);
+            return make_partial_closure(adaptor{}, count);
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::take
 
-inline constexpr _unspecified::take_adaptor take{};
+inline constexpr _unspecified::take::adaptor take{};
 
 } // namespace views
 

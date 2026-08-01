@@ -11,18 +11,18 @@
 
 namespace yu::tuples {
 
-namespace _detail {
+namespace _detail::constructible_from_elements {
 
 template <typename T, typename Tuple, typename... Args, std::size_t... Idx>
-consteval bool constructible_from_elements_impl(std::index_sequence<Idx...>) {
+consteval bool impl(std::index_sequence<Idx...>) {
     return std::constructible_from<T, element_type_t<Idx, Tuple>..., Args...>;
 }
 
-} // namespace _detail
+} // namespace _detail::constructible_from_elements
 
 template <typename T, typename Tuple, typename... Args>
 concept constructible_from_elements
-    = tuple<Tuple> && _detail::constructible_from_elements_impl<T, Tuple, Args...>(indices_for<Tuple>);
+    = tuple<Tuple> && _detail::constructible_from_elements::impl<T, Tuple, Args...>(indices_for<Tuple>);
 
 } // namespace yu::tuples
 

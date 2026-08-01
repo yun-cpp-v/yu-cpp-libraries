@@ -41,18 +41,18 @@ template <typename Tuple>
 as_rvalue_view(Tuple&&) -> as_rvalue_view<views::all_t<Tuple&&>>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::as_rvalue {
 
-struct as_rvalue_closure : tuple_adaptor_closure<as_rvalue_closure> {
+struct closure : tuple_adaptor_closure<closure> {
         template <tuple Tuple>
         static constexpr auto operator()(Tuple&& tuple) noexcept(noexcept(as_rvalue_view{std::forward<Tuple>(tuple)})) {
             return as_rvalue_view{std::forward<Tuple>(tuple)};
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::as_rvalue
 
-inline constexpr _unspecified::as_rvalue_closure as_rvalue{};
+inline constexpr _unspecified::as_rvalue::closure as_rvalue{};
 
 } // namespace views
 

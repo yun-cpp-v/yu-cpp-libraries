@@ -90,9 +90,9 @@ filter_view(T&&, P) -> filter_view<views::all_t<T&&>, P>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::filter {
 
-struct filter_adaptor {
+struct adaptor {
         template <tuple Tuple, typename Pred>
         requires elementwise_meta_predicate<Pred, Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pred&& pred) noexcept(
@@ -103,13 +103,13 @@ struct filter_adaptor {
 
         template <typename P>
         static constexpr auto operator()(P&& pred) noexcept {
-            return make_partial_closure(filter_adaptor{}, std::forward<P>(pred));
+            return make_partial_closure(adaptor{}, std::forward<P>(pred));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::filter
 
-inline constexpr _unspecified::filter_adaptor filter;
+inline constexpr _unspecified::filter::adaptor filter;
 
 } // namespace views
 

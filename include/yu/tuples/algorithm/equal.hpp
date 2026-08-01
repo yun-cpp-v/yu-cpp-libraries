@@ -15,9 +15,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::equal {
 
-struct equal_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -53,11 +53,11 @@ struct equal_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::equal
 
 inline namespace _fn {
 
-inline constexpr _unspecified::equal_fn equal{};
+inline constexpr _unspecified::equal::fn equal{};
 
 }
 

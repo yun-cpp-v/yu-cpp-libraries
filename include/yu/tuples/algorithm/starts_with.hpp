@@ -16,9 +16,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::starts_with {
 
-struct starts_with_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -56,11 +56,11 @@ struct starts_with_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::starts_with
 
 inline namespace _fn {
 
-inline constexpr _unspecified::starts_with_fn starts_with{};
+inline constexpr _unspecified::starts_with::fn starts_with{};
 
 }
 

@@ -9,19 +9,19 @@
 #endif
 
 #ifndef DEFINE_FUNCTION_OBJECT
-#define DEFINE_FUNCTION_OBJECT(NAME)                 \
-    inline namespace _fn {                           \
-                                                     \
-    inline constexpr _unspecified::NAME##_fn NAME{}; \
-                                                     \
+#define DEFINE_FUNCTION_OBJECT(NAME)                \
+    inline namespace _fn {                          \
+                                                    \
+    inline constexpr _unspecified::NAME::fn NAME{}; \
+                                                    \
     }
 #endif
 
 #ifndef DEFINE_UNARY_CONCEPT
 #define DEFINE_UNARY_CONCEPT(NAME)                                                             \
-    namespace _unspecified {                                                                   \
+    namespace _unspecified::NAME {                                                             \
                                                                                                \
-    struct NAME##_fn {                                                                         \
+    struct fn {                                                                                \
             template <typename T>                                                              \
             [[nodiscard]]                                                                      \
             static constexpr auto operator()(type_t<T>) noexcept -> constant_t<std::NAME<T>> { \
@@ -35,9 +35,9 @@
 
 #ifndef DEFINE_BINARY_CONCEPT
 #define DEFINE_BINARY_CONCEPT(NAME)                                                                          \
-    namespace _unspecified {                                                                                 \
+    namespace _unspecified::NAME {                                                                           \
                                                                                                              \
-    struct NAME##_fn {                                                                                       \
+    struct fn {                                                                                              \
             template <typename T, typename U>                                                                \
             [[nodiscard]]                                                                                    \
             static constexpr auto operator()(type_t<T>, type_t<U>) noexcept -> constant_t<std::NAME<T, U>> { \
@@ -51,9 +51,9 @@
 
 #ifndef DEFINE_TERNARY_CONCEPT
 #define DEFINE_TERNARY_CONCEPT(NAME)                                                   \
-    namespace _unspecified {                                                           \
+    namespace _unspecified::NAME {                                                     \
                                                                                        \
-    struct NAME##_fn {                                                                 \
+    struct fn {                                                                        \
             template <typename T, typename U, typename V>                              \
             [[nodiscard]]                                                              \
             static constexpr auto operator()(type_t<T>, type_t<U>, type_t<V>) noexcept \
@@ -68,9 +68,9 @@
 
 #ifndef DEFINE_AT_LEAST_ONE_ARITY_CONCEPT
 #define DEFINE_AT_LEAST_ONE_ARITY_CONCEPT(NAME)                                                                      \
-    namespace _unspecified {                                                                                         \
+    namespace _unspecified::NAME {                                                                                   \
                                                                                                                      \
-    struct NAME##_fn {                                                                                               \
+    struct fn {                                                                                                      \
             template <typename T, typename... Ts>                                                                    \
             [[nodiscard]]                                                                                            \
             static constexpr auto operator()(type_t<T>, type_t<Ts>...) noexcept -> constant_t<std::NAME<T, Ts...>> { \
@@ -84,9 +84,9 @@
 
 #ifndef DEFINE_AT_LEAST_TWO_ARITY_CONCEPT
 #define DEFINE_AT_LEAST_TWO_ARITY_CONCEPT(NAME)                                            \
-    namespace _unspecified {                                                               \
+    namespace _unspecified::NAME {                                                         \
                                                                                            \
-    struct NAME##_fn {                                                                     \
+    struct fn {                                                                            \
             template <typename T, typename U, typename... Ts>                              \
             [[nodiscard]]                                                                  \
             static constexpr auto operator()(type_t<T>, type_t<U>, type_t<Ts>...) noexcept \
@@ -101,9 +101,9 @@
 
 #ifndef DEFINE_VARIADIC_CONCEPT
 #define DEFINE_VARIADIC_CONCEPT(NAME)                                                                  \
-    namespace _unspecified {                                                                           \
+    namespace _unspecified::NAME {                                                                     \
                                                                                                        \
-    struct NAME##_fn {                                                                                 \
+    struct fn {                                                                                        \
             template <typename... Ts>                                                                  \
             [[nodiscard]]                                                                              \
             static constexpr auto operator()(type_t<Ts>...) noexcept -> constant_t<std::NAME<Ts...>> { \

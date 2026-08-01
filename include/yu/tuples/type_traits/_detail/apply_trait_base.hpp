@@ -25,7 +25,7 @@ template <
     typename Fn,
     typename... Args
 >
-requires tuple<Tuple> && ((Idx < size_v<Tuple>) && ...)
+requires tuples::tuple<Tuple> && ((Idx < size_v<Tuple>) && ...)
 struct apply_trait_base_impl<std::index_sequence<Idx...>, InvocationTrait, Tuple, Fn, Args...> :
     InvocationTrait<Args..., Fn, element_type_t<Idx, Tuple>...> {};
 

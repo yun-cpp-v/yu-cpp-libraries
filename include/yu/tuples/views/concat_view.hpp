@@ -30,9 +30,9 @@ template <typename... Tuples>
 concat_view(Tuples&&...) -> concat_view<views::all_t<Tuples&&>...>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::concat {
 
-struct concat_adaptor {
+struct adaptor {
         template <tuple... Tuples>
         static constexpr auto operator()(Tuples&&... tuples) noexcept(noexcept(concat_view{
             std::forward<Tuples>(tuples)...
@@ -41,9 +41,9 @@ struct concat_adaptor {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::concat
 
-inline constexpr _unspecified::concat_adaptor concat{};
+inline constexpr _unspecified::concat::adaptor concat{};
 
 } // namespace views
 

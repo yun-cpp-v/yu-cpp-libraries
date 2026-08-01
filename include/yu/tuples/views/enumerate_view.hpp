@@ -46,18 +46,18 @@ enumerate_view(Tuple&&) -> enumerate_view<views::all_t<Tuple&&>>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::enumerate {
 
-struct enumerate_closure : tuple_adaptor_closure<enumerate_closure> {
+struct closure : tuple_adaptor_closure<closure> {
         template <tuple Tuple>
         static constexpr auto operator()(Tuple&& tuple) noexcept(noexcept(enumerate_view{std::forward<Tuple>(tuple)})) {
             return enumerate_view{std::forward<Tuple>(tuple)};
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::enumerate
 
-inline constexpr _unspecified::enumerate_closure enumerate{};
+inline constexpr _unspecified::enumerate::closure enumerate{};
 
 } // namespace views
 

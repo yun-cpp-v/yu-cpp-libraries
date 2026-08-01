@@ -12,9 +12,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::count {
 
-struct count_fn {
+struct fn {
     public:
         template <tuple Tuple, typename T, typename Proj = std::identity>
         [[nodiscard]]
@@ -27,11 +27,11 @@ struct count_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::count
 
 inline namespace _fn {
 
-inline constexpr _unspecified::count_fn count{};
+inline constexpr _unspecified::count::fn count{};
 
 }
 

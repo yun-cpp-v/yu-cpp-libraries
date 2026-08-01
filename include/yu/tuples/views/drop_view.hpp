@@ -30,9 +30,9 @@ drop_view(Tuple&&, index_t<Count>) -> drop_view<views::all_t<Tuple&&>, Count>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::drop {
 
-struct drop_adaptor {
+struct adaptor {
         template <tuple Tuple, std::size_t Count>
         static constexpr auto operator()(Tuple&& tuple, index_t<Count> count) noexcept(
             noexcept(drop_view{std::forward<Tuple>(tuple), count})
@@ -42,13 +42,13 @@ struct drop_adaptor {
 
         template <std::size_t Count>
         static constexpr auto operator()(index_t<Count> count) noexcept {
-            return make_partial_closure(drop_adaptor{}, count);
+            return make_partial_closure(adaptor{}, count);
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::drop
 
-inline constexpr _unspecified::drop_adaptor drop{};
+inline constexpr _unspecified::drop::adaptor drop{};
 
 } // namespace views
 

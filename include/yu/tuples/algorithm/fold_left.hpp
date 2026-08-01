@@ -10,9 +10,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::fold_left {
 
-struct fold_left_fn {
+struct fn {
     public:
         template <tuple Tuple, typename T, typename Fn>
         requires _detail::left_foldable<Fn, T, Tuple>
@@ -31,11 +31,11 @@ struct fold_left_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::fold_left
 
 inline namespace _fn {
 
-inline constexpr _unspecified::fold_left_fn fold_left{};
+inline constexpr _unspecified::fold_left::fn fold_left{};
 
 }
 

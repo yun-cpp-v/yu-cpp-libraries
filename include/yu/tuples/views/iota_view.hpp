@@ -32,9 +32,9 @@ iota_view(index_t<Start>, index_t<End>) -> iota_view<Start, End>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::iota {
 
-struct iota_fn {
+struct fn {
         template <std::size_t Start, std::size_t End>
         requires (Start <= End)
         [[nodiscard]]
@@ -43,9 +43,9 @@ struct iota_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::iota
 
-inline constexpr _unspecified::iota_fn iota{};
+inline constexpr _unspecified::iota::fn iota{};
 
 } // namespace views
 

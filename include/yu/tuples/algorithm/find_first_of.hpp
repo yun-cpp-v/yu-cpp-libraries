@@ -16,9 +16,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::find_first_of {
 
-struct find_first_of_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -55,11 +55,11 @@ struct find_first_of_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::find_first_of
 
 inline namespace _fn {
 
-inline constexpr _unspecified::find_first_of_fn find_first_of{};
+inline constexpr _unspecified::find_first_of::fn find_first_of{};
 
 }
 

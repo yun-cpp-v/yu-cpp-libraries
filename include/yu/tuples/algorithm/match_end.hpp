@@ -13,9 +13,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::match_end {
 
-struct match_end_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -32,7 +32,7 @@ struct match_end_fn {
             Proj1    proj1 = {},
             Proj2    proj2 = {}
         ) {
-            auto&& result = find_end(
+            auto&& result = tuples::find_end(
                 std::forward<Tuple1>(tuple1),
                 std::forward<Tuple2>(tuple2),
                 std::ref(pred),
@@ -46,11 +46,11 @@ struct match_end_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::match_end
 
 inline namespace _fn {
 
-inline constexpr _unspecified::match_end_fn match_end{};
+inline constexpr _unspecified::match_end::fn match_end{};
 
 }
 

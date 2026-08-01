@@ -11,9 +11,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::contains {
 
-struct contains_fn {
+struct fn {
     public:
         template <tuple Tuple, typename T, typename Proj = std::identity>
         [[nodiscard]]
@@ -26,11 +26,11 @@ struct contains_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::contains
 
 inline namespace _fn {
 
-inline constexpr _unspecified::contains_fn contains{};
+inline constexpr _unspecified::contains::fn contains{};
 
 }
 

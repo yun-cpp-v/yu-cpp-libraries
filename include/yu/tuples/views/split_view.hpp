@@ -121,9 +121,9 @@ split_view(Tuple&&, Pred) -> split_view<views::all_t<Tuple&&>, Pred>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::split {
 
-struct split_adaptor {
+struct adaptor {
         template <tuple Tuple, typename Pred>
         requires elementwise_meta_predicate<Pred, Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pred&& pred) noexcept(
@@ -134,13 +134,13 @@ struct split_adaptor {
 
         template <typename P>
         static constexpr auto operator()(P&& pred) noexcept {
-            return make_partial_closure(split_adaptor{}, std::forward<P>(pred));
+            return make_partial_closure(adaptor{}, std::forward<P>(pred));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::split
 
-inline constexpr _unspecified::split_adaptor split;
+inline constexpr _unspecified::split::adaptor split;
 
 } // namespace views
 

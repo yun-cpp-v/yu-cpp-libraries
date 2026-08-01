@@ -8,9 +8,9 @@
 
 namespace yu::meta {
 
-namespace _detail {
+namespace _detail::constant {
 
-struct constant_operators {
+struct operators {
     public:
         template <constant_like T, constant_like... Args>
         requires requires { constant_t<T::value(Args::value...)>{}; }
@@ -71,10 +71,10 @@ struct constant_operators {
 #undef DEFINE_BINARY_LOGICAL_OPERATOR
 };
 
-} // namespace _detail
+} // namespace _detail::constant
 
 template <auto X>
-struct constant_t : _detail::constant_operators {
+struct constant_t : _detail::constant::operators {
         static constexpr auto value = X;
         using type                  = constant_t;
         using value_type            = std::remove_cvref_t<decltype(X)>;

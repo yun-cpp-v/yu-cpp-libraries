@@ -97,9 +97,9 @@ template <typename... Tuples>
 cartesian_product_view(Tuples&&...) -> cartesian_product_view<views::all_t<Tuples&&>...>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::cartesian_product {
 
-struct cartesian_product_adaptor {
+struct adaptor {
         template <tuple... Tuples>
         static constexpr auto operator()(Tuples&&... tuples) noexcept(noexcept(cartesian_product_view{
             std::forward<Tuples>(tuples)...
@@ -107,12 +107,12 @@ struct cartesian_product_adaptor {
             return cartesian_product_view{std::forward<Tuples>(tuples)...};
         }
 
-        static constexpr auto operator()() noexcept { return single(std::tuple{}); }
+        static constexpr auto operator()() noexcept { return views::single(std::tuple{}); }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::cartesian_product
 
-inline constexpr _unspecified::cartesian_product_adaptor cartesian_product{};
+inline constexpr _unspecified::cartesian_product::adaptor cartesian_product{};
 
 } // namespace views
 

@@ -34,9 +34,9 @@ template <typename Tuple, typename Pred>
 take_while_view(Tuple&&, Pred) -> take_while_view<views::all_t<Tuple&&>, Pred>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::take_while {
 
-struct take_while_adaptor {
+struct adaptor {
         template <tuple Tuple, typename Pred>
         requires elementwise_meta_predicate<Pred, Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pred&& pred) noexcept(
@@ -47,13 +47,13 @@ struct take_while_adaptor {
 
         template <typename P>
         static constexpr auto operator()(P&& pred) noexcept {
-            return partial_closure(take_while_adaptor{}, std::forward<P>(pred));
+            return partial_closure(adaptor{}, std::forward<P>(pred));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::take_while
 
-inline constexpr _unspecified::take_while_adaptor take_while;
+inline constexpr _unspecified::take_while::adaptor take_while;
 
 } // namespace views
 

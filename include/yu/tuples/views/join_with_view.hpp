@@ -59,9 +59,9 @@ template <typename Tuple, typename Pattern>
 join_with_view(Tuple&&, Pattern&&) -> join_with_view<views::all_t<Tuple&&>, views::all_t<Pattern&&>>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::join_with {
 
-struct join_with_adaptor {
+struct adaptor {
         template <tuple Tuple, tuple Pattern>
         requires tuples::_detail::tuple_of_tuples<Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pattern&& pattern) noexcept(
@@ -73,27 +73,27 @@ struct join_with_adaptor {
         template <tuple Tuple, typename Pattern>
         requires tuples::_detail::tuple_of_tuples<Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pattern&& pattern) noexcept(
-            noexcept(join_with_view{std::forward<Tuple>(tuple), single(std::forward<Pattern>(pattern))})
+            noexcept(join_with_view{std::forward<Tuple>(tuple), views::single(std::forward<Pattern>(pattern))})
         ) {
-            return join_with_view{std::forward<Tuple>(tuple), single(std::forward<Pattern>(pattern))};
+            return join_with_view{std::forward<Tuple>(tuple), views::single(std::forward<Pattern>(pattern))};
         }
 
         template <tuple Pattern>
         static constexpr auto operator()(Pattern&& pattern) noexcept(
             noexcept(views::all(std::forward<Pattern>(pattern)))
         ) {
-            return make_partial_closure(join_with_adaptor{}, views::all(std::forward<Pattern>(pattern)));
+            return make_partial_closure(adaptor{}, views::all(std::forward<Pattern>(pattern)));
         }
 
         template <typename Pattern>
         static constexpr auto operator()(Pattern&& pattern) noexcept {
-            return make_partial_closure(join_with_adaptor{}, std::forward<Pattern>(pattern));
+            return make_partial_closure(adaptor{}, std::forward<Pattern>(pattern));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::join_with
 
-inline constexpr _unspecified::join_with_adaptor join_with{};
+inline constexpr _unspecified::join_with::adaptor join_with{};
 
 } // namespace views
 } // namespace yu::tuples

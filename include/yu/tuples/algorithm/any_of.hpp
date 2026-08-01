@@ -11,9 +11,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::any_of {
 
-struct any_of_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Pred, typename Proj = std::identity>
         requires elementwise_unary_predicate<Pred, projected<Tuple, Proj>>
@@ -28,11 +28,11 @@ struct any_of_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::any_of
 
 inline namespace _fn {
 
-inline constexpr _unspecified::any_of_fn any_of{};
+inline constexpr _unspecified::any_of::fn any_of{};
 
 }
 

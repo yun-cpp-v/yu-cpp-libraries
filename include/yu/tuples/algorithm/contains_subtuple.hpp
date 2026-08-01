@@ -11,9 +11,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::contains_subtuple {
 
-struct contains_subtuple_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -42,11 +42,11 @@ struct contains_subtuple_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::contains_subtuple
 
 inline namespace _fn {
 
-inline constexpr _unspecified::contains_subtuple_fn contains_subtuple{};
+inline constexpr _unspecified::contains_subtuple::fn contains_subtuple{};
 
 }
 

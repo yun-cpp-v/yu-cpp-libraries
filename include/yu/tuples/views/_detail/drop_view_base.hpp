@@ -17,7 +17,7 @@ class drop_view_base {
     private:
         View base_;
 
-        static constexpr auto base_size_  = size<View>{};
+        static constexpr auto base_size_  = tuples::size<View>{};
         static constexpr auto drop_count_ = index<((Count < base_size_) ? Count : base_size_)>;
 
     public:

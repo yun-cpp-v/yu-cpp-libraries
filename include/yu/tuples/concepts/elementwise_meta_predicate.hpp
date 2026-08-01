@@ -11,20 +11,20 @@
 
 namespace yu::tuples {
 
-namespace _detail {
+namespace _detail::elementwise_meta_predicate {
 
 template <typename Pred, typename Tuple, std::size_t... Idx>
-consteval bool elementwise_meta_predicate_impl(std::index_sequence<Idx...>) {
+consteval bool impl(std::index_sequence<Idx...>) {
     return (
         meta::predicate<std::decay_t<Pred>, decltype(meta::as_type(tuples::get(std::declval<Tuple>(), index<Idx>)))>
         && ...
     );
 }
 
-} // namespace _detail
+} // namespace _detail::elementwise_meta_predicate
 
 template <typename P, typename T>
-concept elementwise_meta_predicate = tuple<T> && _detail::elementwise_meta_predicate_impl<P, T>(indices_for<T>);
+concept elementwise_meta_predicate = tuple<T> && _detail::elementwise_meta_predicate::impl<P, T>(indices_for<T>);
 
 } // namespace yu::tuples
 

@@ -14,9 +14,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::match_n {
 
-struct match_n_fn {
+struct fn {
     public:
         template <
             tuple Tuple,
@@ -33,7 +33,7 @@ struct match_n_fn {
             Pred           pred = {},
             Proj           proj = {}
         ) {
-            auto&& result = search_n(std::forward<Tuple>(tuple), value, count, std::ref(pred), std::ref(proj));
+            auto&& result = tuples::search_n(std::forward<Tuple>(tuple), value, count, std::ref(pred), std::ref(proj));
 
             return result.transform([&](std::size_t index) {
                 return segment{std::forward<Tuple>(tuple), index, Count};
@@ -41,11 +41,11 @@ struct match_n_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::match_n
 
 inline namespace _fn {
 
-inline constexpr _unspecified::match_n_fn match_n{};
+inline constexpr _unspecified::match_n::fn match_n{};
 
 }
 

@@ -13,9 +13,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::match {
 
-struct match_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -46,11 +46,11 @@ struct match_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::match
 
 inline namespace _fn {
 
-inline constexpr _unspecified::match_fn match{};
+inline constexpr _unspecified::match::fn match{};
 
 }
 

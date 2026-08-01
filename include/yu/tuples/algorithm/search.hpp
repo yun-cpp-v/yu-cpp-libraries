@@ -17,9 +17,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::search {
 
-struct search_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -69,11 +69,11 @@ struct search_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::search
 
 inline namespace _fn {
 
-inline constexpr _unspecified::search_fn search{};
+inline constexpr _unspecified::search::fn search{};
 
 }
 

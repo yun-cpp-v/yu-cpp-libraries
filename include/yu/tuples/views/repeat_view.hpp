@@ -36,9 +36,9 @@ repeat_view(Tuple, index_t<Size>) -> repeat_view<Tuple, Size>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::repeat {
 
-struct repeat_fn {
+struct fn {
         template <std::move_constructible T, std::size_t Size>
         requires std::is_object_v<T>
         [[nodiscard]]
@@ -49,9 +49,9 @@ struct repeat_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::repeat
 
-inline constexpr _unspecified::repeat_fn repeat;
+inline constexpr _unspecified::repeat::fn repeat;
 
 } // namespace views
 

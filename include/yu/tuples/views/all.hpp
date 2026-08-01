@@ -22,11 +22,14 @@ concept ref_viewable = requires(Tuple&& tuple) { ref_view{std::forward<Tuple>(tu
 template <typename Tuple>
 concept owning_viewable = requires(Tuple&& tuple) { owning_view{std::forward<Tuple>(tuple)}; };
 
+template <typename Tuple>
+concept view_or_viewable = view<std::remove_cvref_t<Tuple>> || ref_viewable<Tuple> || owning_viewable<Tuple>;
+
 } // namespace _detail::all
 
-namespace _unspecified {
+namespace _unspecified::all {
 
-struct all_closure : tuple_adaptor_closure<all_closure> {
+struct closure : tuple_adaptor_closure<closure> {
     private:
         template <typename Tuple>
         static consteval bool is_nothrow() {
@@ -41,10 +44,7 @@ struct all_closure : tuple_adaptor_closure<all_closure> {
 
     public:
         template <tuple Tuple>
-        requires (
-            view<std::remove_cvref_t<Tuple>> || _detail::all::ref_viewable<Tuple>
-            || _detail::all::owning_viewable<Tuple>
-        )
+        requires _detail::all::view_or_viewable<Tuple>
         [[nodiscard]]
         static constexpr auto operator()(Tuple&& tuple) noexcept(is_nothrow<Tuple>()) {
             if constexpr (view<std::remove_cvref_t<Tuple>>) {
@@ -57,9 +57,9 @@ struct all_closure : tuple_adaptor_closure<all_closure> {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::all
 
-inline constexpr _unspecified::all_closure all{};
+inline constexpr _unspecified::all::closure all{};
 
 template <tuple Tuple>
 using all_t = decltype(all(std::declval<Tuple>()));

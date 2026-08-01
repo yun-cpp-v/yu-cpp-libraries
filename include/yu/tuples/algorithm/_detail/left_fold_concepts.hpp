@@ -42,10 +42,10 @@ consteval bool left_folable_first_impl(std::index_sequence<Idx...>) {
 }
 
 template <typename F, typename T, typename Tup>
-concept left_foldable = tuple<Tup> && left_foldable_impl<F, T, Tup>(indices_for<Tup>);
+concept left_foldable = left_foldable_impl<F, T, Tup>(indices_for<Tup>);
 
 template <typename F, typename Tup>
-concept left_foldable_first = tuple<Tup> && left_folable_first_impl<F, Tup>(indices_for<Tup>);
+concept left_foldable_first = left_folable_first_impl<F, Tup>(indices_for<Tup>);
 
 } // namespace yu::tuples::_detail
 

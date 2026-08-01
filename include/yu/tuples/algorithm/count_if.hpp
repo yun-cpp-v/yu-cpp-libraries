@@ -12,9 +12,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::count_if {
 
-struct count_if_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Pred, typename Proj = std::identity>
         requires elementwise_unary_predicate<functional::with_fallback_t<Pred, bool>, projected<Tuple, Proj>>
@@ -31,11 +31,11 @@ struct count_if_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::count_if
 
 inline namespace _fn {
 
-inline constexpr _unspecified::count_if_fn count_if{};
+inline constexpr _unspecified::count_if::fn count_if{};
 
 }
 

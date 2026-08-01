@@ -11,24 +11,24 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::locate_if_not {
 
-struct locate_if_not_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Pred, typename Proj = std::identity>
         [[nodiscard]]
         static constexpr decltype(auto) operator()(Tuple&& tuple, Pred pred, Proj proj = {}) {
-            auto&& result = find_if_not(std::forward<Tuple>(tuple), std::ref(pred), std::ref(proj));
+            auto&& result = tuples::find_if_not(std::forward<Tuple>(tuple), std::ref(pred), std::ref(proj));
 
             return result.transform([&](std::size_t index) { return location{std::forward<Tuple>(tuple), index}; });
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::locate_if_not
 
 inline namespace _fn {
 
-inline constexpr _unspecified::locate_if_not_fn locate_if_not{};
+inline constexpr _unspecified::locate_if_not::fn locate_if_not{};
 
 }
 

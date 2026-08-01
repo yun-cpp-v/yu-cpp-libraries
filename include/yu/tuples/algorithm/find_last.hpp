@@ -12,13 +12,13 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::find_last {
 
-struct find_last_fn {
+struct fn {
         template <tuple Tuple, typename T, typename Proj = std::identity>
         [[nodiscard]]
         static constexpr std::optional<std::size_t> operator()(Tuple&& tuple, const T& value, Proj proj = {}) {
-            return find_last_if(
+            return tuples::find_last_if(
                 std::forward<Tuple>(tuple),
                 std::bind_back(std::ranges::equal_to{}, value),
                 std::ref(proj)
@@ -26,11 +26,11 @@ struct find_last_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::find_last
 
 inline namespace _fn {
 
-inline constexpr _unspecified::find_last_fn find_last{};
+inline constexpr _unspecified::find_last::fn find_last{};
 
 }
 

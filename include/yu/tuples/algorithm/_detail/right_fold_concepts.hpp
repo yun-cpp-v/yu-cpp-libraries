@@ -46,10 +46,10 @@ consteval bool right_foldable_last_impl(std::index_sequence<Idx...>) {
 }
 
 template <typename F, typename T, typename Tup>
-concept right_foldable = tuple<Tup> && right_foldable_impl<F, T, Tup>(indices_for<Tup>);
+concept right_foldable = right_foldable_impl<F, T, Tup>(indices_for<Tup>);
 
 template <typename F, typename Tup>
-concept right_foldable_last = tuple<Tup> && right_foldable_last_impl<F, Tup>(indices_for<Tup>);
+concept right_foldable_last = right_foldable_last_impl<F, Tup>(indices_for<Tup>);
 
 } // namespace yu::tuples::_detail
 

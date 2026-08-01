@@ -16,9 +16,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::find_end {
 
-struct find_end_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -70,11 +70,11 @@ struct find_end_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::find_end
 
 inline namespace _fn {
 
-inline constexpr _unspecified::find_end_fn find_end{};
+inline constexpr _unspecified::find_end::fn find_end{};
 
 }
 

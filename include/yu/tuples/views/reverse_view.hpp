@@ -44,18 +44,18 @@ reverse_view(Tuple&&) -> reverse_view<views::all_t<Tuple&&>>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::reverse {
 
-struct reverse_closure : tuple_adaptor_closure<reverse_closure> {
+struct closure : tuple_adaptor_closure<closure> {
         template <tuple Tuple>
         static constexpr auto operator()(Tuple&& tuple) noexcept(noexcept(reverse_view{std::forward<Tuple>(tuple)})) {
             return reverse_view{std::forward<Tuple>(tuple)};
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::reverse
 
-inline constexpr _unspecified::reverse_closure reverse{};
+inline constexpr _unspecified::reverse::closure reverse{};
 
 } // namespace views
 

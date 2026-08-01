@@ -20,7 +20,7 @@ template <
 struct get_trait_base : Fallback {};
 
 template <template <typename...> typename InvocationTrait, std::size_t Idx, typename Tuple, typename Fallback>
-requires tuple<Tuple> && (Idx < size_v<Tuple>)
+requires tuples::tuple<Tuple> && (Idx < size_v<Tuple>)
 struct get_trait_base<InvocationTrait, Idx, Tuple, Fallback> :
     InvocationTrait<decltype(tuples::get), Tuple, index_t<Idx>> {};
 

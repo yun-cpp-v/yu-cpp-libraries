@@ -34,9 +34,9 @@ template <typename Tuple, typename Pred>
 drop_while_view(Tuple&&, Pred) -> drop_while_view<views::all_t<Tuple&&>, Pred>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::drop_while {
 
-struct drop_while_adaptor {
+struct adaptor {
         template <tuple Tuple, typename Pred>
         requires elementwise_meta_predicate<Pred, Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pred&& pred) noexcept(
@@ -47,13 +47,13 @@ struct drop_while_adaptor {
 
         template <typename P>
         static constexpr auto operator()(P&& pred) noexcept {
-            return partial_closure(drop_while_adaptor{}, std::forward<P>(pred));
+            return partial_closure(adaptor{}, std::forward<P>(pred));
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::drop_while
 
-inline constexpr _unspecified::drop_while_adaptor drop_while;
+inline constexpr _unspecified::drop_while::adaptor drop_while;
 
 } // namespace views
 

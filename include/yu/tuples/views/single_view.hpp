@@ -35,9 +35,9 @@ single_view(T) -> single_view<T>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::single {
 
-struct single_fn {
+struct fn {
         template <std::move_constructible T>
         requires std::is_object_v<T>
         [[nodiscard]]
@@ -46,9 +46,9 @@ struct single_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::single
 
-inline constexpr _unspecified::single_fn single{};
+inline constexpr _unspecified::single::fn single{};
 
 } // namespace views
 

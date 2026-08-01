@@ -31,9 +31,9 @@ template <typename Tuple>
 join_view(Tuple&&) -> join_view<views::all_t<Tuple&&>>;
 
 namespace views {
-namespace _unspecified {
+namespace _unspecified::join {
 
-struct join_adaptor : public tuple_adaptor_closure<join_adaptor> {
+struct adaptor : public tuple_adaptor_closure<adaptor> {
         template <tuple Tuple>
         requires tuples::_detail::tuple_of_tuples<Tuple>
         static constexpr auto operator()(Tuple&& tuple) noexcept(noexcept(join_view{std::forward<Tuple>(tuple)})) {
@@ -41,9 +41,9 @@ struct join_adaptor : public tuple_adaptor_closure<join_adaptor> {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::join
 
-inline constexpr _unspecified::join_adaptor join{};
+inline constexpr _unspecified::join::adaptor join{};
 
 } // namespace views
 

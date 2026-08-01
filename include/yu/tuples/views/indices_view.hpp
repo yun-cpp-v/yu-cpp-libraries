@@ -12,9 +12,9 @@ using indices_view = iota_view<0, Size>;
 
 namespace views {
 
-namespace _unspecified {
+namespace _unspecified::indices {
 
-struct indices_fn {
+struct fn {
         template <std::size_t Size>
         [[nodiscard]]
         static constexpr auto operator()(index_t<Size>) noexcept {
@@ -22,9 +22,9 @@ struct indices_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::indices
 
-inline constexpr _unspecified::indices_fn indices{};
+inline constexpr _unspecified::indices::fn indices{};
 
 } // namespace views
 

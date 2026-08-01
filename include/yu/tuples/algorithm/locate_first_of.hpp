@@ -13,9 +13,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::locate_first_of {
 
-struct locate_first_of_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -32,7 +32,7 @@ struct locate_first_of_fn {
             Proj1    proj1 = {},
             Proj2    proj2 = {}
         ) {
-            auto&& result = find_first_of(
+            auto&& result = tuples::find_first_of(
                 std::forward<Tuple1>(tuple1),
                 std::forward<Tuple2>(tuple2),
                 std::ref(pred),
@@ -44,11 +44,11 @@ struct locate_first_of_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::locate_first_of
 
 inline namespace _fn {
 
-inline constexpr _unspecified::locate_first_of_fn locate_first_of{};
+inline constexpr _unspecified::locate_first_of::fn locate_first_of{};
 
 }
 

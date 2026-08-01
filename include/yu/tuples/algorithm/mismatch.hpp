@@ -18,9 +18,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::mismatch {
 
-struct mismatch_fn {
+struct fn {
     public:
         template <
             tuple Tuple1,
@@ -65,11 +65,11 @@ struct mismatch_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::mismatch
 
 inline namespace _fn {
 
-inline constexpr _unspecified::mismatch_fn mismatch{};
+inline constexpr _unspecified::mismatch::fn mismatch{};
 
 }
 

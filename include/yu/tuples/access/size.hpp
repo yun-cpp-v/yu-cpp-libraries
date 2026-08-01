@@ -9,7 +9,7 @@
 
 namespace yu::tuples {
 
-namespace _detail {
+namespace _detail::size {
 
 template <typename T>
 concept tuple_size_defined = requires {
@@ -18,7 +18,7 @@ concept tuple_size_defined = requires {
 };
 
 template <typename T>
-consteval std::size_t size_impl() {
+consteval std::size_t impl() {
     if constexpr (std::is_bounded_array_v<T>) {
         return std::extent_v<T>;
     } else if constexpr (tuple_size_defined<T>) {
@@ -26,14 +26,14 @@ consteval std::size_t size_impl() {
     }
 }
 
-} // namespace _detail
+} // namespace _detail::size
 
 template <typename T>
 struct size {};
 
 template <typename T>
-requires std::is_bounded_array_v<std::remove_cvref_t<T>> || _detail::tuple_size_defined<std::remove_cvref_t<T>>
-struct size<T> : index_t<_detail::size_impl<std::remove_cvref_t<T>>()> {};
+requires std::is_bounded_array_v<std::remove_cvref_t<T>> || _detail::size::tuple_size_defined<std::remove_cvref_t<T>>
+struct size<T> : index_t<_detail::size::impl<std::remove_cvref_t<T>>()> {};
 
 template <typename T>
 inline constexpr std::size_t size_v = size<T>::value;

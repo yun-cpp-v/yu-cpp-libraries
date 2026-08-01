@@ -12,11 +12,11 @@ namespace yu::tuples::_detail {
 
 template <typename T, std::size_t... Idx>
 consteval bool tuple_of_tuples_impl(std::index_sequence<Idx...>) {
-    return (tuple<element_type_t<Idx, T>> && ...);
+    return (tuples::tuple<element_type_t<Idx, T>> && ...);
 }
 
 template <typename T>
-concept tuple_of_tuples = tuple<T> && tuple_of_tuples_impl<T>(indices_for<T>);
+concept tuple_of_tuples = tuples::tuple<T> && tuple_of_tuples_impl<T>(indices_for<T>);
 
 } // namespace yu::tuples::_detail
 

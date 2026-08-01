@@ -11,19 +11,19 @@
 
 namespace yu::tuples {
 
-namespace _detail {
+namespace _detail::elementwise_unary_predicate {
 
 template <typename F, typename Tup, std::size_t... Idx>
-consteval bool elementwise_unary_predicate_impl(std::index_sequence<Idx...>) {
+consteval bool impl(std::index_sequence<Idx...>) {
     return (std::predicate<F, element_type_t<Idx, Tup>> && ...);
 }
 
-} // namespace _detail
+} // namespace _detail::elementwise_unary_predicate
 
 // elementwise_unary_invocable
 template <typename Fn, typename Tuple>
 concept elementwise_unary_predicate
-    = tuple<Tuple> && _detail::elementwise_unary_predicate_impl<Fn, Tuple>(indices_for<Tuple>);
+    = tuple<Tuple> && _detail::elementwise_unary_predicate::impl<Fn, Tuple>(indices_for<Tuple>);
 
 } // namespace yu::tuples
 

@@ -13,9 +13,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::for_each {
 
-struct for_each_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Fn, typename Proj = std::identity>
         requires elementwise_unary_invocable<Fn, projected<Tuple, Proj>>
@@ -29,11 +29,11 @@ struct for_each_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::for_each
 
 inline namespace _fn {
 
-inline constexpr _unspecified::for_each_fn for_each{};
+inline constexpr _unspecified::for_each::fn for_each{};
 
 }
 

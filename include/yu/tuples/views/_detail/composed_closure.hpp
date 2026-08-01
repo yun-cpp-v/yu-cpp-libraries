@@ -47,7 +47,7 @@ struct composed_closure : tuple_adaptor_closure<composed_closure<Closure1, Closu
         ) :
             closure1_(std::forward<T1>(cl1)), closure2_(std::forward<T2>(cl2)) {}
 
-        template <typename Self, tuple Tuple>
+        template <typename Self, tuples::tuple Tuple>
         [[nodiscard]]
         constexpr decltype(auto) operator()(this Self&& self, Tuple&& tuple) noexcept(
             is_nothrow(std::forward<Self>(self), std::forward<Tuple>(tuple))

@@ -14,14 +14,14 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::find_if_not {
 
-struct find_if_not_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Pred, typename Proj = std::identity>
         [[nodiscard]]
         static constexpr std::optional<std::size_t> operator()(Tuple&& tuple, Pred pred, Proj proj = {}) {
-            return find_if(
+            return tuples::find_if(
                 std::forward<Tuple>(tuple),
                 std::not_fn(functional::with_fallback(std::ref(pred), false)),
                 std::ref(proj)
@@ -29,11 +29,11 @@ struct find_if_not_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::find_if_not
 
 inline namespace _fn {
 
-inline constexpr _unspecified::find_if_not_fn find_if_not{};
+inline constexpr _unspecified::find_if_not::fn find_if_not{};
 
 }
 

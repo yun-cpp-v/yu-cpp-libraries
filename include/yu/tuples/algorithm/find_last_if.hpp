@@ -16,9 +16,9 @@
 
 namespace yu::tuples {
 
-namespace _unspecified {
+namespace _unspecified::find_last_if {
 
-struct find_last_if_fn {
+struct fn {
     public:
         template <tuple Tuple, typename Pred, typename Proj = std::identity>
         [[nodiscard]]
@@ -43,11 +43,11 @@ struct find_last_if_fn {
         }
 };
 
-} // namespace _unspecified
+} // namespace _unspecified::find_last_if
 
 inline namespace _fn {
 
-inline constexpr _unspecified::find_last_if_fn find_last_if{};
+inline constexpr _unspecified::find_last_if::fn find_last_if{};
 
 }
 
