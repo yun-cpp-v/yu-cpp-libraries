@@ -24,7 +24,7 @@
 #include "views/repeat_view.hpp"            // IWYU pragma: export
 #include "views/reverse_view.hpp"           // IWYU pragma: export
 #include "views/single_view.hpp"            // IWYU pragma: export
-#include "views/split_view.hpp"             // IWYU pragma: export
+#include "views/split_when_view.hpp"        // IWYU pragma: export
 #include "views/take_view.hpp"              // IWYU pragma: export
 #include "views/take_while_view.hpp"        // IWYU pragma: export
 #include "views/transform_view.hpp"         // IWYU pragma: export

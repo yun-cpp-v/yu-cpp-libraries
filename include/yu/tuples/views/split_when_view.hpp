@@ -1,6 +1,6 @@
 // yutool: include guard
-#ifndef YU_TUPLES_VIEWS_SPLIT_VIEW_HPP_
-#define YU_TUPLES_VIEWS_SPLIT_VIEW_HPP_
+#ifndef YU_TUPLES_VIEWS_SPLIT_WHEN_VIEW_HPP_
+#define YU_TUPLES_VIEWS_SPLIT_WHEN_VIEW_HPP_
 
 #include "_detail/meta_predicate_result_at.hpp"
 #include "all.hpp"
@@ -37,7 +37,7 @@ struct index_ranges {
 
 template <view View, typename Pred>
 requires elementwise_meta_predicate<Pred, View>
-class split_view : public view_interface<split_view<View, Pred>> {
+class split_when_view : public view_interface<split_when_view<View, Pred>> {
     private:
         static consteval auto make_index_ranges() {
             constexpr auto result = []<std::size_t... Idx>(std::index_sequence<Idx...>) consteval {
@@ -91,7 +91,7 @@ class split_view : public view_interface<split_view<View, Pred>> {
     public:
         static constexpr auto size = meta::constant_invoke(meta::constant<&index_ranges_t::count>, index_ranges_);
 
-        constexpr explicit split_view(View view, Pred) noexcept :
+        constexpr explicit split_when_view(View view, Pred) noexcept :
             base_(std::move(view)) {}
 
         template <typename Self>
@@ -117,19 +117,19 @@ class split_view : public view_interface<split_view<View, Pred>> {
 };
 
 template <typename Tuple, typename Pred>
-split_view(Tuple&&, Pred) -> split_view<views::all_t<Tuple&&>, Pred>;
+split_when_view(Tuple&&, Pred) -> split_when_view<views::all_t<Tuple&&>, Pred>;
 
 namespace views {
 
-namespace _unspecified::split {
+namespace _unspecified::split_when {
 
 struct adaptor {
         template <tuple Tuple, typename Pred>
         requires elementwise_meta_predicate<Pred, Tuple>
         static constexpr auto operator()(Tuple&& tuple, Pred&& pred) noexcept(
-            noexcept(split_view{std::forward<Tuple>(tuple), std::forward<Pred>(pred)})
+            noexcept(split_when_view{std::forward<Tuple>(tuple), std::forward<Pred>(pred)})
         ) {
-            return split_view{std::forward<Tuple>(tuple), std::forward<Pred>(pred)};
+            return split_when_view{std::forward<Tuple>(tuple), std::forward<Pred>(pred)};
         }
 
         template <typename P>
@@ -138,9 +138,9 @@ struct adaptor {
         }
 };
 
-} // namespace _unspecified::split
+} // namespace _unspecified::split_when
 
-inline constexpr _unspecified::split::adaptor split;
+inline constexpr _unspecified::split_when::adaptor split_when;
 
 } // namespace views
 
