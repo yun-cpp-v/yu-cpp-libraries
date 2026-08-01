@@ -4,7 +4,6 @@
 
 #include "tuple_adaptor_closure_base.hpp"
 #include <yu/tuples/concepts/tuple.hpp>
-#include <concepts>
 #include <functional>
 #include <type_traits>
 #include <utility>
@@ -20,13 +19,10 @@ struct composed_closure : tuple_adaptor_closure<composed_closure<Closure1, Closu
         Closure2 closure2_;
 
         template <typename Self, typename Tuple>
-        static consteval bool invocable(Self&& self, Tuple&& tuple) {
-            return requires { std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple))); };
-        }
-
-        template <typename Self, typename Tuple>
-        static consteval bool is_nothrow(Self&& self, Tuple&& tuple) {
-            return noexcept(std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple))));
+        static consteval bool invocable() {
+            return requires(Self&& self, Tuple&& tuple) {
+                std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple)));
+            };
         }
 
         template <typename Self>
@@ -40,30 +36,23 @@ struct composed_closure : tuple_adaptor_closure<composed_closure<Closure1, Closu
         }
 
     public:
-        template <typename T1, typename T2>
-        requires std::constructible_from<Closure1, T1&&> && std::constructible_from<Closure2, T2&&>
-        constexpr explicit composed_closure(T1&& cl1, T2&& cl2) noexcept(
-            std::is_nothrow_constructible_v<Closure1, T1&&> && std::is_nothrow_constructible_v<Closure2, T2&&>
+        constexpr explicit composed_closure(Closure1&& closure1, Closure2&& closure2) noexcept(
+            std::is_nothrow_move_constructible_v<Closure1> && std::is_nothrow_move_constructible_v<Closure2>
         ) :
-            closure1_(std::forward<T1>(cl1)), closure2_(std::forward<T2>(cl2)) {}
+            closure1_(std::move(closure1)), closure2_(std::move(closure2)) {}
 
         template <typename Self, tuples::tuple Tuple>
+        requires (invocable<Self, Tuple>())
         [[nodiscard]]
         constexpr decltype(auto) operator()(this Self&& self, Tuple&& tuple) noexcept(
-            is_nothrow(std::forward<Self>(self), std::forward<Tuple>(tuple))
-        ) requires (invocable(std::forward<Self>(self), std::forward<Tuple>(tuple)))
-        {
+            nothrow(std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple))))
+        ) {
             return std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple)));
         }
 };
 
 template <typename T1, typename T2>
 composed_closure(T1, T2) -> composed_closure<T1, T2>;
-
-template <typename Closure1, typename Closure2>
-constexpr auto compose_closures(Closure1&& closure1, Closure2&& closure2) {
-    return composed_closure{std::forward<Closure1>(closure1), std::forward<Closure2>(closure2)};
-}
 
 } // namespace yu::tuples::_detail
 

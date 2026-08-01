@@ -4,7 +4,6 @@
 
 #include "_detail/adaptor_closure.hpp"
 #include "_detail/composed_closure.hpp"
-#include "_detail/decay_constructible.hpp"
 #include <yu/tuples/concepts/tuple.hpp>
 #include <concepts>
 #include <functional>
@@ -19,7 +18,6 @@ template <typename D>
 requires std::is_class_v<D> && std::same_as<D, std::remove_cv_t<D>>
 struct tuple_adaptor_closure;
 
-// Apply TACO to Tuple
 template <tuple Tuple, _detail::adaptor_closure Closure>
 requires std::invocable<Closure, Tuple&&>
 [[nodiscard]]
@@ -29,14 +27,12 @@ constexpr decltype(auto) operator|(Tuple&& tuple, Closure&& closure) noexcept(
     return std::invoke(std::forward<Closure>(closure), std::forward<Tuple>(tuple));
 }
 
-// TACO composition
 template <_detail::adaptor_closure Closure1, _detail::adaptor_closure Closure2>
-requires _detail::decay_constructible<Closure1> && _detail::decay_constructible<Closure2>
 [[nodiscard]]
 constexpr auto operator|(Closure1&& closure1, Closure2&& closure2) noexcept(
-    _detail::is_nothrow_decay_constructible_v<Closure1> && _detail::is_nothrow_decay_constructible_v<Closure2>
+    _detail::composed_closure{std::forward<Closure1>(closure1), std::forward<Closure2>(closure2)}
 ) {
-    return _detail::compose_closures(std::forward<Closure1>(closure1), std::forward<Closure2>(closure2));
+    return _detail::composed_closure{std::forward<Closure1>(closure1), std::forward<Closure2>(closure2)};
 }
 
 } // namespace yu::tuples

@@ -58,12 +58,12 @@ class flatten_view_base {
         }
 
         template <std::size_t Idx, typename Self>
-        static consteval bool is_nothrow(Self&& self) {
+        static consteval bool is_nothrow() {
             constexpr auto map         = index_map_[index<Idx>];
             constexpr auto base_index  = meta::constant_invoke(meta::constant<&mapped_index::base_index>, map);
             constexpr auto inner_index = meta::constant_invoke(meta::constant<&mapped_index::inner_index>, map);
 
-            return noexcept(tuples::get(tuples::get(self.base(), base_index), inner_index));
+            return noexcept(tuples::get(tuples::get(std::declval<Self>().base(), base_index), inner_index));
         }
 
     public:
@@ -75,7 +75,7 @@ class flatten_view_base {
         template <std::size_t Idx, typename Self>
         requires (Idx < size)
         [[nodiscard]]
-        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx>(std::forward<Self>(self))) {
+        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx, Self>()) {
             constexpr auto map         = index_map_[index<Idx>];
             constexpr auto base_index  = meta::constant_invoke(meta::constant<&mapped_index::base_index>, map);
             constexpr auto inner_index = meta::constant_invoke(meta::constant<&mapped_index::inner_index>, map);

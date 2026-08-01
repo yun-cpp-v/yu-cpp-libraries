@@ -47,22 +47,22 @@ class split_view : public view_interface<split_view<View, Pred>> {
                 using _detail::split_view::index_range;
                 using _detail::split_view::index_ranges;
 
-                std::array<index_range, points_size + 1> groups{};
+                std::array<index_range, points_size + 1> range_groups{};
 
                 std::size_t range_count = 0;
                 std::size_t range_begin = 0;
 
                 for (std::size_t i = 0; i < points_size; ++i) {
                     if (split_points[i]) {
-                        groups[range_count++] = {range_begin, i};
+                        range_groups[range_count++] = index_range{range_begin, i};
 
                         range_begin = i + 1;
                     }
                 }
 
-                groups[range_count++] = {range_begin, points_size};
+                range_groups[range_count++] = {range_begin, points_size};
 
-                return index_ranges<points_size + 1>{range_count, groups};
+                return index_ranges<points_size + 1>{range_count, range_groups};
             }(indices_for<View>);
 
             return meta::constant<result>;

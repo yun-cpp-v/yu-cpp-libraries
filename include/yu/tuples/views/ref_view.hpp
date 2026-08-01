@@ -2,7 +2,6 @@
 #ifndef YU_TUPLES_VIEWS_REF_VIEW_HPP_
 #define YU_TUPLES_VIEWS_REF_VIEW_HPP_
 
-#include "_detail/different_from.hpp"
 #include "view_interface.hpp"
 #include <yu/tuples/access/index.hpp>
 #include <yu/tuples/concepts/tuple.hpp>
@@ -27,8 +26,9 @@ class ref_view : public view_interface<ref_view<Tuple>> {
     public:
         static constexpr size<Tuple> size{};
 
-        template <_detail::different_from<ref_view> T>
-        requires std::convertible_to<T, Tuple&> && requires { bind_lvalue(std::declval<T>()); }
+        template <typename T>
+        requires (!std::same_as<std::remove_cvref_t<T>, ref_view>)
+                 && std::convertible_to<T, Tuple&> && requires { bind_lvalue(std::declval<T>()); }
         constexpr ref_view(T&& tuple) noexcept :
             base_ptr_(std::addressof(static_cast<Tuple&>(std::forward<T>(tuple)))) {}
 
