@@ -45,7 +45,7 @@ struct composed_closure : tuple_adaptor_closure<composed_closure<Closure1, Closu
         requires (invocable<Self, Tuple>())
         [[nodiscard]]
         constexpr decltype(auto) operator()(this Self&& self, Tuple&& tuple) noexcept(
-            nothrow(std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple))))
+            noexcept(std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple))))
         ) {
             return std::invoke(self.closure2(), std::invoke(self.closure1(), std::forward<Tuple>(tuple)));
         }
