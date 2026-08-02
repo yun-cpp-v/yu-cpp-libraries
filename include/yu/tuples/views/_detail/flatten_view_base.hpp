@@ -42,7 +42,7 @@ class flatten_view_base {
 
                 std::array<index_pair, size> index_map;
 
-                std::ranges::copy(index_map_view, index_map.begin());
+                std::ranges::move(index_map_view, index_map.begin());
 
                 return index_map;
             }(indices_for<Base>);
