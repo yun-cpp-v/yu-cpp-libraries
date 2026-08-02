@@ -16,6 +16,7 @@
 #include <yu/tuples/utility/index_sequence_for.hpp>
 #include <yu/tuples/views/single_view.hpp>
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -23,18 +24,40 @@ namespace yu::tuples {
 namespace _detail::join_with_view {
 
 template <typename View, typename Pattern>
-struct separator_insert_view : public tuples::view_interface<separator_insert_view<View, Pattern>> {
-        View    base;
-        Pattern pattern;
-
-        static constexpr index_t<2 * size_v<View> - 1> size{};
+class separator_insert_view : public tuples::view_interface<separator_insert_view<View, Pattern>> {
+    private:
+        View    base_;
+        Pattern pattern_;
 
         template <std::size_t Idx, typename Self>
-        constexpr decltype(auto) get(this Self&& self) {
+        static consteval bool is_nothrow() {
             if constexpr (Idx % 2 == 0) {
-                return tuples::get(std::forward_like<Self>(self.base), index<Idx / 2>);
+                return noexcept(tuples::get(std::declval<Self>().base(), index<Idx / 2>));
             } else {
-                return std::forward_like<Self>(self.pattern);
+                return true;
+            }
+        }
+
+    public:
+        static constexpr index_t<2 * size_v<View> - 1> size{};
+
+        constexpr explicit separator_insert_view(View view, Pattern pattern) noexcept(
+            std::is_nothrow_move_constructible_v<View> && std::is_nothrow_move_constructible_v<Pattern>
+        ) :
+            base_(view), pattern_(pattern) {}
+
+        template <typename Self>
+        constexpr decltype(auto) base(this Self&& self) noexcept {
+            return std::forward_like<Self>(self.base_);
+        }
+
+        template <std::size_t Idx, typename Self>
+        requires (Idx < size)
+        constexpr decltype(auto) get(this Self&& self) noexcept(is_nothrow<Idx, Self>()) {
+            if constexpr (Idx % 2 == 0) {
+                return tuples::get(self.base(), index<Idx / 2>);
+            } else {
+                return std::forward_like<Self>(self.pattern_);
             }
         }
 };
@@ -51,8 +74,11 @@ class join_with_view :
         using base_t     = _detail::flatten_view_base<inserter_t>;
 
     public:
-        constexpr explicit join_with_view(View view, Pattern pattern) noexcept :
-            base_t(inserter_t{.base = std::move(view), .pattern = std::move(pattern)}) {}
+        constexpr explicit join_with_view(View view, Pattern pattern) noexcept(
+            std::is_nothrow_constructible_v<inserter_t, View&&, Pattern&&>
+            && std::is_nothrow_constructible_v<base_t, inserter_t>
+        ) :
+            base_t(inserter_t{std::move(view), std::move(pattern)}) {}
 };
 
 template <typename Tuple, typename Pattern>
@@ -80,13 +106,15 @@ struct adaptor {
 
         template <tuple Pattern>
         static constexpr auto operator()(Pattern&& pattern) noexcept(
-            noexcept(views::all(std::forward<Pattern>(pattern)))
+            noexcept(make_partial_closure(adaptor{}, views::all(std::forward<Pattern>(pattern))))
         ) {
             return make_partial_closure(adaptor{}, views::all(std::forward<Pattern>(pattern)));
         }
 
         template <typename Pattern>
-        static constexpr auto operator()(Pattern&& pattern) noexcept {
+        static constexpr auto operator()(Pattern&& pattern) noexcept(
+            noexcept(make_partial_closure(adaptor{}, std::forward<Pattern>(pattern)))
+        ) {
             return make_partial_closure(adaptor{}, std::forward<Pattern>(pattern));
         }
 };

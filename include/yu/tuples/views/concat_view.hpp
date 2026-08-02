@@ -10,6 +10,7 @@
 #include <yu/tuples/concepts/view.hpp>
 #include <yu/tuples/utility/index_sequence_for.hpp>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -19,11 +20,15 @@ class concat_view :
     public _detail::flatten_view_base<std::tuple<Views...>>,
     public view_interface<concat_view<Views...>> {
     private:
-        using base_t = _detail::flatten_view_base<std::tuple<Views...>>;
+        using base_tuple_t = std::tuple<Views...>;
+        using base_t       = _detail::flatten_view_base<base_tuple_t>;
 
     public:
-        constexpr explicit concat_view(Views... views) noexcept :
-            base_t(std::tuple<Views...>{std::move(views)...}) {}
+        constexpr explicit concat_view(Views... views) noexcept(
+            std::is_nothrow_constructible_v<base_tuple_t, Views&&...>
+            && std::is_nothrow_constructible_v<base_t, base_tuple_t>
+        ) :
+            base_t(base_tuple_t{std::move(views)...}) {}
 };
 
 template <typename... Tuples>

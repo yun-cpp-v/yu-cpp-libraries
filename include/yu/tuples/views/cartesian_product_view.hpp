@@ -16,6 +16,7 @@
 #include <array>
 #include <ranges>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -49,6 +50,7 @@ class cartesian_product_view : public view_interface<cartesian_product_view<View
         using indices_table_t = decltype(indices_table_)::value_type;
 
         std::tuple<Views...> bases_;
+        using bases_t = std::tuple<Views...>;
 
         template <typename Self>
         constexpr decltype(auto) bases(this Self&& self) noexcept {
@@ -74,7 +76,9 @@ class cartesian_product_view : public view_interface<cartesian_product_view<View
     public:
         static constexpr auto size = meta::constant_invoke(meta::constant<&indices_table_t::size>, indices_table_);
 
-        constexpr explicit cartesian_product_view(Views... views) :
+        constexpr explicit cartesian_product_view(
+            Views... views
+        ) noexcept(std::is_nothrow_constructible_v<bases_t, Views&&...>) :
             bases_(std::move(views)...) {}
 
         template <std::size_t Idx, typename Self>

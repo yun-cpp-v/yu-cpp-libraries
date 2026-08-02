@@ -11,6 +11,7 @@
 #include <yu/tuples/concepts/view.hpp>
 #include <yu/tuples/type_traits/element_type.hpp>
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -21,7 +22,9 @@ class take_view : public _detail::take_view_base<View, Count>, public view_inter
         using base_t = _detail::take_view_base<View, Count>;
 
     public:
-        constexpr explicit take_view(View view, index_t<Count>) noexcept :
+        constexpr explicit take_view(View view, index_t<Count>) noexcept(
+            std::is_nothrow_constructible_v<base_t, View&&>
+        ) :
             base_t(std::move(view)) {}
 };
 
@@ -41,7 +44,9 @@ struct adaptor {
         }
 
         template <std::size_t Count>
-        static constexpr auto operator()(index_t<Count> count) noexcept {
+        static constexpr auto operator()(index_t<Count> count) noexcept(
+            noexcept(make_partial_closure(adaptor{}, count))
+        ) {
             return make_partial_closure(adaptor{}, count);
         }
 };

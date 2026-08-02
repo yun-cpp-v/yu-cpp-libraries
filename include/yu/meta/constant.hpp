@@ -80,10 +80,10 @@ struct constant_t : _detail::constant::operators {
         using value_type            = std::remove_cvref_t<decltype(X)>;
         using integral_constant     = std::integral_constant<value_type, value>;
 
-        constexpr constant_t() = default;
+        constexpr constant_t() noexcept = default;
 
         template <constant_like T>
-        constexpr explicit constant_t(T&&) {}
+        constexpr explicit constant_t(T&&) noexcept {}
 
         constexpr operator value_type() const noexcept { return value; }
 };

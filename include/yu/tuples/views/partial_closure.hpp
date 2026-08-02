@@ -8,6 +8,7 @@
 #include <yu/tuples/concepts/tuple.hpp>
 #include <functional>
 #include <tuple>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -18,6 +19,7 @@ struct partial_closure : tuple_adaptor_closure<partial_closure<Adaptor, Args...>
         [[no_unique_address]]
         Adaptor             adaptor_;
         std::tuple<Args...> args_;
+        using args_t = std::tuple<Args...>;
 
         template <typename Self>
         constexpr decltype(auto) adaptor(this Self&& self) noexcept {
@@ -57,7 +59,9 @@ struct partial_closure : tuple_adaptor_closure<partial_closure<Adaptor, Args...>
         }
 
     public:
-        constexpr explicit partial_closure(Adaptor adaptor, Args... args) noexcept :
+        constexpr explicit partial_closure(Adaptor adaptor, Args... args) noexcept(
+            std::is_nothrow_move_constructible_v<Adaptor> && std::is_nothrow_constructible_v<args_t, Args&&...>
+        ) :
             adaptor_(std::move(adaptor)), args_(std::move(args)...) {}
 
         template <typename Self, tuple Tuple>
@@ -73,7 +77,9 @@ template <typename Adaptor, typename... Args>
 partial_closure(Adaptor, Args...) -> partial_closure<Adaptor, Args...>;
 
 template <typename Adaptor, typename... Args>
-constexpr auto make_partial_closure(Adaptor&& adaptor, Args&&... args) noexcept {
+constexpr auto make_partial_closure(Adaptor&& adaptor, Args&&... args) noexcept(
+    noexcept(partial_closure{std::forward<Adaptor>(adaptor), std::forward<Args>(args)...})
+) {
     return partial_closure{std::forward<Adaptor>(adaptor), std::forward<Args>(args)...};
 }
 

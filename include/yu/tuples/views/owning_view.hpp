@@ -7,6 +7,7 @@
 #include <yu/tuples/concepts/tuple.hpp>
 #include <concepts>
 #include <cstddef>
+#include <type_traits>
 
 namespace yu::tuples {
 
@@ -19,12 +20,7 @@ class owning_view : public view_interface<owning_view<Tuple>> {
     public:
         static constexpr size<Tuple> size{};
 
-        // template <typename T>
-        // requires std::constructible_from<Tuple, T&&>
-        // constexpr owning_view(T&& tuple) :
-        //     base_(std::forward<T>(tuple)) {}
-
-        constexpr owning_view(Tuple&& tuple) :
+        constexpr owning_view(Tuple&& tuple) noexcept(std::is_move_constructible_v<Tuple>) :
             base_(std::move(tuple)) {}
 
         template <typename Self>

@@ -5,11 +5,11 @@
 #include "location.hpp"
 #include <yu/tuples/utility/index_sequence_for.hpp>
 #include <yu/tuples/views/all.hpp>
-#include <cassert>
 #include <cstddef>
 #include <iterator>
 #include <memory>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -31,14 +31,16 @@ class segment_iterator {
         using reference  = value_type;
         using pointer    = void;
 
-        constexpr segment_iterator()                                    = default;
+        constexpr segment_iterator() noexcept                           = default;
         constexpr segment_iterator(View&&, std::size_t, std::ptrdiff_t) = delete;
 
         constexpr explicit segment_iterator(const View& view, std::size_t first, std::ptrdiff_t pos) noexcept :
             view_(std::addressof(view)), first_(first), pos_(pos) {}
 
         [[nodiscard]]
-        constexpr value_type operator*() const noexcept {
+        constexpr value_type operator*() const noexcept(
+            std::is_nothrow_constructible_v<value_type, View, std::size_t>
+        ) {
             auto idx = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(first_) + pos_);
 
             return value_type{*view_, idx};
@@ -121,11 +123,10 @@ class segment : public std::ranges::view_interface<segment<View>> {
         using value_type = iterator::value_type;
         using reference  = iterator::reference;
 
-        constexpr explicit segment(View view, std::size_t first, std::size_t size) :
-            view_(std::move(view)), first_(first), size_(size) {
-            assert(first <= size_v<View>);
-            assert(size <= size_v<View> - first);
-        }
+        constexpr explicit segment(View view, std::size_t first, std::size_t size) noexcept(
+            std::is_nothrow_move_constructible_v<View>
+        ) :
+            view_(std::move(view)), first_(first), size_(size) {}
 
         template <typename Self>
         [[nodiscard]]

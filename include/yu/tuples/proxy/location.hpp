@@ -7,9 +7,9 @@
 #include <yu/tuples/utility/index_sequence_for.hpp>
 #include <yu/tuples/views/all.hpp>
 #include <array>
-#include <cassert>
 #include <cstddef>
 #include <functional>
+#include <type_traits>
 #include <utility>
 #include <variant>
 
@@ -35,10 +35,8 @@ class location {
         std::size_t index_;
 
     public:
-        constexpr explicit location(View view, std::size_t index) noexcept :
-            view_(std::move(view)), index_(index) {
-            assert(index < size_v<View>);
-        }
+        constexpr explicit location(View view, std::size_t index) noexcept(std::is_move_constructible_v<View>) :
+            view_(std::move(view)), index_(index) {}
 
         template <typename Self>
         [[nodiscard]]

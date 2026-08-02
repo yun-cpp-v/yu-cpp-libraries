@@ -13,6 +13,7 @@
 #include <yu/tuples/concepts/tuple.hpp>
 #include <yu/tuples/concepts/view.hpp>
 #include <yu/tuples/type_traits/element_type.hpp>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -26,7 +27,7 @@ class drop_while_view :
         using base_t = _detail::drop_view_base<View, _detail::prefix_size<View, Pred>>;
 
     public:
-        constexpr explicit drop_while_view(View view, Pred) noexcept :
+        constexpr explicit drop_while_view(View view, Pred) noexcept(std::is_nothrow_constructible_v<base_t, View&&>) :
             base_t(std::move(view)) {}
 };
 
@@ -45,9 +46,11 @@ struct adaptor {
             return drop_while_view{std::forward<Tuple>(tuple), std::forward<Pred>(pred)};
         }
 
-        template <typename P>
-        static constexpr auto operator()(P&& pred) noexcept {
-            return partial_closure(adaptor{}, std::forward<P>(pred));
+        template <typename Pred>
+        static constexpr auto operator()(Pred&& pred) noexcept(
+            noexcept(make_partial_closure(adaptor{}, std::forward<Pred>(pred)))
+        ) {
+            return make_partial_closure(adaptor{}, std::forward<Pred>(pred));
         }
 };
 

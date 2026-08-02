@@ -6,6 +6,7 @@
 #include <yu/tuples/concepts/constructible_from_elements.hpp>
 #include <yu/tuples/concepts/tuple.hpp>
 #include <yu/tuples/concepts/view.hpp>
+#include <type_traits>
 
 namespace yu::tuples {
 
@@ -59,9 +60,10 @@ template <typename Ret, typename... Args>
 class type_adaptor {
     private:
         std::tuple<Args...> args_;
+        using args_t = std::tuple<Args...>;
 
     public:
-        constexpr explicit type_adaptor(Args... args) :
+        constexpr explicit type_adaptor(Args... args) noexcept(std::is_nothrow_constructible_v<args_t, Args&&...>) :
             args_(std::move(args)...) {}
 
         template <tuple Tuple, typename Adaptor>
@@ -81,9 +83,10 @@ template <template <typename...> typename RetT, typename... Args>
 class template_adaptor {
     private:
         std::tuple<Args...> args_;
+        using args_t = std::tuple<Args...>;
 
     public:
-        constexpr explicit template_adaptor(Args... args) :
+        constexpr explicit template_adaptor(Args... args) noexcept(std::is_nothrow_constructible_v<args_t, Args&&...>) :
             args_(std::move(args)...) {}
 
         template <tuple Tuple, typename Adaptor>

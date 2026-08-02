@@ -11,6 +11,7 @@
 #include <yu/tuples/type_traits/element_type.hpp>
 #include <concepts>
 #include <functional>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -33,7 +34,9 @@ class transform_view : public view_interface<transform_view<View, Fn>> {
 
         template <typename F>
         requires std::constructible_from<Fn, F&&>
-        constexpr explicit transform_view(View view, F&& fn) noexcept :
+        constexpr explicit transform_view(View view, F&& fn) noexcept(
+            std::is_nothrow_move_constructible_v<View> && std::is_nothrow_constructible_v<Fn, F&&>
+        ) :
             base_(std::move(view)), fn_(std::forward<F>(fn)) {}
 
         template <typename Self>
@@ -69,8 +72,10 @@ struct adaptor {
         }
 
         template <typename Fn>
-        static constexpr auto operator()(Fn&& fn) noexcept {
-            return partial_closure(adaptor{}, std::forward<Fn>(fn));
+        static constexpr auto operator()(Fn&& fn) noexcept(
+            noexcept(make_partial_closure(adaptor{}, std::forward<Fn>(fn)))
+        ) {
+            return make_partial_closure(adaptor{}, std::forward<Fn>(fn));
         }
 };
 

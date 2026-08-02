@@ -11,6 +11,7 @@
 #include <yu/tuples/concepts/tuple.hpp>
 #include <yu/tuples/concepts/view.hpp>
 #include <yu/tuples/utility/index_sequence_for.hpp>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples {
@@ -42,7 +43,7 @@ class elements_view : public view_interface<elements_view<View, N>> {
             return std::forward_like<Self>(self.base_);
         }
 
-        constexpr explicit elements_view(View view, index_t<N>) :
+        constexpr explicit elements_view(View view, index_t<N>) noexcept(std::is_nothrow_move_constructible_v<View>) :
             base_(std::move(view)) {}
 
         template <std::size_t Idx, typename Self>
@@ -73,7 +74,7 @@ struct adaptor {
         }
 
         template <std::size_t N>
-        static constexpr auto operator()(index_t<N> n) noexcept {
+        static constexpr auto operator()(index_t<N> n) noexcept(noexcept(make_partial_closure(adaptor{}, n))) {
             return make_partial_closure(adaptor{}, n);
         }
 };

@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <ranges>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples::_detail {
@@ -73,7 +74,9 @@ class flatten_view_base {
     public:
         static constexpr auto size = meta::constant_invoke(meta::constant<&index_map_t::size>, index_map_);
 
-        constexpr explicit flatten_view_base(Base base) noexcept :
+        constexpr explicit flatten_view_base(Base base) noexcept(
+            std::is_nothrow_move_constructible_v<Base>
+        ) :
             base_(std::move(base)) {}
 
         template <std::size_t Idx, typename Self>

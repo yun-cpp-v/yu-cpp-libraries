@@ -8,6 +8,7 @@
 #include <yu/tuples/views/all.hpp>
 #include <yu/tuples/views/view_interface.hpp>
 #include <cstddef>
+#include <type_traits>
 #include <utility>
 
 namespace yu::tuples::_detail {
@@ -23,7 +24,7 @@ class take_view_base {
     public:
         static constexpr auto size = take_count_;
 
-        constexpr explicit take_view_base(View view) noexcept :
+        constexpr explicit take_view_base(View view) noexcept(std::is_nothrow_move_constructible_v<View>) :
             base_(std::move(view)) {}
 
         template <typename Self>
