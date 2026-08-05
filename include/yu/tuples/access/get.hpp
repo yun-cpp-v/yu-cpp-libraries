@@ -32,7 +32,7 @@ namespace _unspecified::get {
 struct fn {
     private:
         template <std::size_t Idx, typename T>
-        static constexpr bool is_nothrow() {
+        static consteval bool is_nothrow() {
             if constexpr (std::is_bounded_array_v<std::remove_cvref_t<T>>) {
                 return true;
             } else if constexpr (_detail::get::member_gettable<Idx, T>) {

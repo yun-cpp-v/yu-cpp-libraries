@@ -36,7 +36,7 @@ class cartesian_product_view : public view_interface<cartesian_product_view<View
                 std::array<indices_t, size> indices_table;
 
                 std::ranges::transform(indices_table_view, indices_table.begin(), [](auto tuple) {
-                    return tuples::apply([](auto... index) { return std::array{index...}; }, tuple);
+                    return tuples::apply([](auto... index) { return indices_t{index...}; }, tuple);
                 });
 
                 return indices_table;
